@@ -11,7 +11,7 @@ export const numberingGenerator = (numbering: number) => {
     return res
 }
 export class ReleaseProductMessage {
-    private message = "";
+    private message?: string;
     private iTems: any;
     constructor(items: any) {
         this.iTems = items
@@ -58,6 +58,8 @@ export class ReleaseProductMessage {
                 const getProduc = await Product.findById(element.product_Id).exec();
                 const getStorage_Room = await StorageRoom.findById(element.storage_Room_Id).exec();
                 // storage_Room_Id
+                // const pro = getProduc?.name.toString();
+                // const storage = getStorage_Room?.name.toString();
                 this.message = `${getProduc?.name} in ${getStorage_Room?.name} is not enough!`
             } else if (qtyNeed < TotalInsockItemQty) {
                 this.message = `Release Product Created!`

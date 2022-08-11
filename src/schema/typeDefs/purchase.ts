@@ -24,6 +24,7 @@ const purchase = gql`
         unit_Price: Float
         purchase_Id: Purchase
         key: DataTime
+        storage_Room_Id: StorageRoom
     }
     type purchaseMessage {
         message: String
