@@ -1,5 +1,5 @@
 export interface storageRoomType {
-    name: string,
+    name: any,
     place: string,
     remark: string,
     created_At: Date
