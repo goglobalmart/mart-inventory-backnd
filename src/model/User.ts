@@ -17,5 +17,5 @@ const userShema = new Schema<userType>({
 },
     { _id: false }
 )
-const models = model<userType>('User', userShema)
-export default models
+const User = model<userType>('User', userShema)
+export default User

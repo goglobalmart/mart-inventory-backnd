@@ -9,5 +9,5 @@ const customerSchemar = new Schema<customerType>({
     remark: String,
     created_At: { type: Date, default: new Date() }
 })
-const models = model<customerType>('Customer', customerSchemar );
-export default models
+const Customer = model<customerType>('Customer', customerSchemar);
+export default Customer;

@@ -6,5 +6,5 @@ const storageRoom = new Schema<storageRoomType>({
     remark: String,
     created_At: { type: Date, default: new Date() }
 })
-const models = model<storageRoomType>('StorageRoom', storageRoom )
-export default models
+const StorageRoom = model<storageRoomType>('StorageRoom', storageRoom )
+export default StorageRoom
