@@ -1,7 +1,6 @@
 import customerType from '../../type/customerType';
 import Customer from '../../model/Customer';
 import authCheck from '../../helpers/auth'
-import mongoose from 'mongoose';
 const customer = {
     Query: {
         getAllCustomer: async (_root: undefined, { }, { req }: { req: any }) => {

@@ -1,5 +1,5 @@
-import Unit from '../../model/Unit'
-import unitType from '../../type/unitType'
+import Unit from '../../model/Unit';
+import unitType from '../../type/unitType';
 const unitResolver = {
     Query:{
         getUnit:async(_root:undefined,{})=>{
