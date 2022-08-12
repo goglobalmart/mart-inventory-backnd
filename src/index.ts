@@ -16,7 +16,7 @@ const typeDefs = mergeTypeDefs(typeDefsFiles)
 const startServer = async () => {
     await connect(`${process.env.DB_PRODUCTION_PORT}`)
     // await connect(`${process.env.DB_DEV_PORT}`)
-        // .then(e => console.log('DB Connected'))
+        .then(e => console.log('DB Connected'))
         .catch(er => console.log('DB Connection Error', er));
     const app = express()
     const httpServer = createServer(app)
