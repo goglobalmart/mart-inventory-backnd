@@ -36,16 +36,8 @@ const purchase = {
                 const query = {
                     $and: [
                         { numbering: { $regex: keyword, $options: "i" } },
-                        // { priority: { $regex: priority, $options: "i" } },
+                        { storage_Room_Id: new mongoose.Types.ObjectId(storage_Room_Id) }
                         // { approve_status: { $regex: approve_status, $options: "i" } },
-                    ],
-                }
-                const query1 = {
-                    $and: [
-                        { numbering: { $regex: keyword, $options: "i" } },
-                        { priority: { $regex: priority, $options: "i" } },
-                        { storage_Room_Id: storage_Room_Id, $options: "i" },
-                        { approve_status: { $regex: approve_status, $options: "i" } },
                     ],
                 }
 
