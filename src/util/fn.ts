@@ -60,7 +60,9 @@ export class ReleaseProductMessage {
                 // storage_Room_Id
                 // const pro = getProduc?.name.toString();
                 // const storage = getStorage_Room?.name.toString();
-                this.message = `${getProduc?.name} in ${getStorage_Room?.name} is not enough!`
+                if (getStorage_Room)
+                    this.message = `${getProduc?.name} in ${getStorage_Room?.name} is not enough!`
+                
             } else if (qtyNeed < TotalInsockItemQty) {
                 this.message = `Release Product Created!`
                 console.log("qtyNeed < TotalInsockItemQty ok work")
