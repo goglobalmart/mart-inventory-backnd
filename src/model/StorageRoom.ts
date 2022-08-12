@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { storageRoomType } from '../type/StorageRoomType'
+import { storageRoomType } from '../type/storageRoomType';
 const storageRoom = new Schema<storageRoomType>({
     name: String,
     place: String,
