@@ -36,6 +36,12 @@ const userResolver = {
         createUser: async (_root: undefined, { input }: { input: userType }, { req }: { req: any }) => {
 
             try {
+                const getUser = await User.findOne({ email: input.email });
+                if (getUser)
+                    return {
+                        message: "The email address is already in use by another account.",
+                        status: false
+                    }
                 const _id = new mongoose.Types.ObjectId();
                 const user = await new User({
                     ...input,

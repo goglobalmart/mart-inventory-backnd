@@ -36,8 +36,9 @@ const purchase = {
                 const query = {
                     $and: [
                         { numbering: { $regex: keyword, $options: "i" } },
-                        { storage_Room_Id: new mongoose.Types.ObjectId(storage_Room_Id) }
-                        // { approve_status: { $regex: approve_status, $options: "i" } },
+                        { storage_Room_Id: new mongoose.Types.ObjectId(storage_Room_Id) },
+                        { priority: { $regex: priority, $options: "i" } },
+                        { approve_status: { $regex: approve_status, $options: "i" } },
                     ],
                 }
 
@@ -49,7 +50,8 @@ const purchase = {
         }
     },
     Mutation: {
-        createPurchase: async (_root: undefined, { input }: { input: purchaseType }) => {
+        createPurchase: async (_root: undefined, { input }: { input: purchaseType }, { req }: { req: any }) => {
+            const currentUser = await authCheck(req.headers.authorization);
             let newArray: {
                 product_Id: Types.ObjectId,
                 qty: number,
@@ -62,7 +64,8 @@ const purchase = {
                 const purchase = await new Purchase({
                     ...input,
                     _id: new mongoose.Types.ObjectId(),
-                    numbering
+                    numbering,
+                    purchase_By: new mongoose.Types.ObjectId(currentUser.uid)
                 }).save();
 
                 if (purchase) {

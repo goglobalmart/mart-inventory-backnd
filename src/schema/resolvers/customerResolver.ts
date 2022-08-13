@@ -3,13 +3,11 @@ import Customer from '../../model/Customer';
 import authCheck from '../../helpers/auth'
 const customer = {
     Query: {
-        getAllCustomer: async (_root: undefined, { }, { req }: { req: any }) => {
-            console.log(req.headers.authorization)
+        getAllCustomer: async (_root: undefined, { keyword }: { keyword: string }, { req }: { req: any }) => {
+
             await authCheck(req.headers.authorization);
-            // const mitd = new mongoose.Types.ObjectId();
-            // console.log(mitd.toString())
             try {
-                const get = await Customer.find({})
+                const get = await Customer.find({ name: { $regex: keyword } }).exec();
                 return get
             } catch (error) {
                 return {

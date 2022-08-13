@@ -2,9 +2,9 @@ import StorageRoom from '../../model/StorageRoom'
 import { storageRoomType } from '../../type/storageRoomType';
 const storageRoomResolver = {
     Query: {
-        getStorageRoom: async (_root: undefined, { }) => {
+        getStorageRoom: async (_root: undefined, { keyword }: { keyword: string }) => {
             try {
-                const getStorageRoom = await StorageRoom.find({})
+                const getStorageRoom = await StorageRoom.find({ name: { $regex: keyword } }).exec();
                 return getStorageRoom
             } catch (error) {
                 return {

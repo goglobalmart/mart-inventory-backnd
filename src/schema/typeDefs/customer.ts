@@ -1,8 +1,8 @@
 import { gql } from 'apollo-server-express'
-const  customer = gql` 
+const customer = gql` 
         scalar DataTime 
         type Query{
-            getAllCustomer: [Customer!]
+            getAllCustomer(keyword: String!): [Customer!]
         }
         type Mutation{
             createCustomer( input: CustomerInput!): customerMessage!
