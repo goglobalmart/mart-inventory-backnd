@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import customerType from '../type/customerType';
 
 const customerSchemar = new Schema<customerType>({
-    customerName: String,
+    name: String,
     email: String,
     phone: String,
     address: String,

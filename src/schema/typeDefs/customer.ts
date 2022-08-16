@@ -15,7 +15,7 @@ const customer = gql`
         }
         type Customer {
             _id:ID
-            customerName:String 
+            name: String 
             email: String
             phone: String 
             address: String 
@@ -23,7 +23,7 @@ const customer = gql`
             created_At: DataTime
         }
         input CustomerInput{
-            customerName: String 
+            name: String 
             email: String
             phone: String 
             address: String 

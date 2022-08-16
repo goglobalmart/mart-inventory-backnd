@@ -1,5 +1,5 @@
 interface customerType {
-  customerName: String,
+  name: String,
   email: string,
   phone: string,
   address: string,

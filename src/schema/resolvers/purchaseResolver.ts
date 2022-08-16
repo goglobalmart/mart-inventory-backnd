@@ -32,18 +32,31 @@ const purchase = {
                     populate: "storage_Room_Id purchase_By receive_By approve_By supplier_id items.product_Id",
 
                 }
+                if (storage_Room_Id === "") {
+                    let query = {
+                        $and: [
+                            { numbering: { $regex: keyword, $options: "i" } },
+                            { priority: { $regex: priority, $options: "i" } },
+                            { approve_status: { $regex: approve_status, $options: "i" } },
+                        ],
+                    }
 
-                const query = {
-                    $and: [
-                        { numbering: { $regex: keyword, $options: "i" } },
-                        { storage_Room_Id: new mongoose.Types.ObjectId(storage_Room_Id) },
-                        { priority: { $regex: priority, $options: "i" } },
-                        { approve_status: { $regex: approve_status, $options: "i" } },
-                    ],
+                    const purchase = await Purchase.paginate(query, options);
+                    return purchase
+                } else {
+                    let query = {
+                        $and: [
+                            { numbering: { $regex: keyword, $options: "i" } },
+                            { storage_Room_Id: new mongoose.Types.ObjectId(storage_Room_Id) },
+                            { priority: { $regex: priority, $options: "i" } },
+                            { approve_status: { $regex: approve_status, $options: "i" } },
+                        ],
+                    }
+
+                    const purchase = await Purchase.paginate(query, options);
+                    return purchase
                 }
 
-                const purchase = await Purchase.paginate(query, options);
-                return purchase
             } catch (error) {
                 return error
             }
