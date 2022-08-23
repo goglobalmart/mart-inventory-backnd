@@ -7,7 +7,10 @@ const supplierSchema = new Schema<supplierType>({
     email: String,
     adress: String,
     remark: String,
+    facebook: String,
+    image_Src: String,
+    image_Name: String,
     created_At: { type: Date, default: new Date() }
 });
-const Supplier = model<supplierType>('Supplier', supplierSchema );
+const Supplier = model<supplierType>('Supplier', supplierSchema);
 export default Supplier;

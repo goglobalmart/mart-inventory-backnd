@@ -9,6 +9,9 @@ type Supplier {
   email: String
   adress: String
   remark: String
+  facebook: String
+  image_Src: String
+  image_Name: String
   created_At: DataTime
 }
 type supplierMessage {
@@ -27,6 +30,9 @@ input createSupplierInput {
   email: String
   adress: String
   remark: String
+  facebook: String
+  image_Src: String
+  image_Name: String
 }
 type Query {
   getSuppliers( keyword: String! ):  getSupplierMessage! 

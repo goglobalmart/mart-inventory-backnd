@@ -96,13 +96,15 @@ const purchase = {
                     await ProductsInStock.insertMany(newArray)
                     return {
                         message: "Purchase Created!",
-                        status: true
+                        status: true,
+                        data: purchase
                     }
                 }
             } catch (error) {
                 return {
                     message: error,
-                    status: false
+                    status: false,
+                    data: null
                 }
             }
         },
@@ -136,12 +138,14 @@ const purchase = {
                     await ProductsInStock.insertMany(newArray);
                     return {
                         message: "Purchase Updated!",
-                        status: true
+                        status: true,
+                        data: purchase
                     }
                 } else {
                     return {
                         message: "Purchase Updated not success!",
-                        status: false
+                        status: false,
+                        data: null
                     }
                 }
             } catch (error) {
@@ -170,18 +174,20 @@ const purchase = {
                     );
                     return {
                         message: `Purchase ${status}!`,
-                        status: true
+                        status: true,
+                        data: purchase
                     }
                 }
             } catch (error) {
                 return {
                     message: error,
-                    status: false
+                    status: false,
+                    data: null
                 }
             }
         },
         voidingPurchas: async (_root: undefined, { purchase_Id }: { purchase_Id: string, status: string }) => {
-            console.log(purchase_Id)
+            // console.log(purchase_Id)
             try {
                 const purchase = await Purchase.findByIdAndUpdate(purchase_Id, { status: true }).exec();
                 if (purchase) {
@@ -195,13 +201,15 @@ const purchase = {
                     );
                     return {
                         message: `Purchase voided!`,
-                        status: true
+                        status: true,
+                        data: purchase
                     }
                 }
             } catch (error) {
                 return {
                     message: error,
-                    status: false
+                    status: false,
+                    data: null
                 }
             }
         },
@@ -233,13 +241,15 @@ const purchase = {
                     })
                     return {
                         message: "Purchase Received!",
-                        status: true
+                        status: true,
+                        data: getReceivePuchas
                     }
                 }
             } catch (error) {
                 return {
                     message: error,
-                    status: false
+                    status: false,
+                    data: null
                 }
             }
         }

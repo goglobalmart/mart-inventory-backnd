@@ -29,6 +29,7 @@ const purchase = gql`
     type purchaseMessage {
         message: String
         status: Boolean
+        data: Purchase
     }
     type getPurchasesPaginationMessage {
         data:[Purchase]

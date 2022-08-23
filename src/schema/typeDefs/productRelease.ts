@@ -18,6 +18,7 @@ const productRelease = gql`
     type releaseMesage {
         message: String
         status: Boolean
+        data: RroductRelease
     }
     type getReleaseProductPaginationMessage {
         data:[RroductRelease]
