@@ -79,8 +79,8 @@ const purchase = {
                     _id: new mongoose.Types.ObjectId(),
                     numbering,
                     purchase_By: new mongoose.Types.ObjectId(currentUser.uid)
-                }).save();
-
+                }).save()
+                purchase.populate('StorageRoom items.Product');
                 if (purchase) {
                     input.items.forEach(element => {
                         const finalResult = Object.assign(

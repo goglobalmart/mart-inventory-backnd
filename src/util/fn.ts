@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import ProductsInStock from '../model/ProductsInStock';
 import Product from '../model/Product';
 import StorageRoom from '../model/StorageRoom'
+import { productInstockType, productType } from "../type/productType";
 
 export const numberingGenerator = (numbering: number) => {
     let str = "" + numbering;
@@ -144,5 +145,39 @@ export class ReleaseProductMessage {
             }
         }
         return await this.message;
+    }
+}
+
+export class getProductOnHandReportClass {
+    private stock_Name?: string;
+    private items: any
+
+    constructor() {
+    }
+
+    public async getMessage() {
+        let productReport: {}[] = [];
+        const getStorageRoom = await StorageRoom.find().exec();
+        if (!getStorageRoom) {
+            return {
+                message: "No Storage Room",
+                status: false,
+                data: null
+            }
+        }
+        getStorageRoom.forEach(async element => {
+            const getProduct = await ProductsInStock.find({
+                storage_Room_Id: element._id,
+                status: false,
+                stock_Status: "instock"
+            }).populate<{ product_Id: productType }>('product_Id');
+            console.log(getProduct)
+            // if (getProduct.length > 0) {
+            productReport.push(getProduct)
+            // }
+            console.log("kk", productReport)
+        })
+        let tt = await productReport;
+        console.log("tt", tt)
     }
 }
