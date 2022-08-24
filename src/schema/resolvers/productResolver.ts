@@ -1,6 +1,6 @@
 import { productType } from '../../type/productType';
 import Product from '../../model/Product';
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 
 const productLabels = {
     docs: "data",

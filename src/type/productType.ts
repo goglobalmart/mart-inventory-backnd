@@ -13,13 +13,13 @@ export interface productType {
     created_At: Date
 }
 export interface productInstockType {
-    product_Id: Types.ObjectId,
+    product_Id: Types.ObjectId | productType,
     qty: number,
     stock_Out: number,
     unit_Price: number,
     status: boolean,
     stock_Status: string,
-    storage_Room_Id: Types.ObjectId,
+    storage_Room_Id?: Types.ObjectId,
     purchase_Id: Types.ObjectId,
     expire_At: Date,
     created_At: Date
