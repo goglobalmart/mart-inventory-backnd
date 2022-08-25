@@ -2,22 +2,21 @@ import { gql } from 'apollo-server-express'
 
 const report = gql`
     type OnHand {
-        stock_Name: String
-        items: [ReportItem]
-    }
-    type ReportItem{
-        product_Name: String
-        product_Catagory: String
+        product: Product
         qty: Float
-        purchas_Date: DataTime
+        unit_Price: Float
+        amount: Float
+       reciev_Date: DataTime
+       expire_At:DataTime
     }
+    
     type getReportMessage {
         message: String
         status: Boolean
         data: [OnHand]
     }
     type Query {
-        getProductOnHandReport: getReportMessage!
+        getStockOnHand: getReportMessage!
     }
 `
 export default report

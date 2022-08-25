@@ -5,35 +5,43 @@ import { productInstockType, productType } from "../../type/productType";
 import { getProductOnHandReportClass } from '../../util/fn'
 const reportResolver = {
     Query: {
-        getProductOnHandReport: async (_root: undefined, { }: {}) => {
-
+        getStockOnHand: async (_root: undefined, { }: {}) => {
             try {
-                const getReport = new getProductOnHandReportClass();
-                getReport.getMessage()
-                // const getStorageRoom = await StorageRoom.find().exec();
-                // if (!getStorageRoom) {
-                //     return {
-                //         message: "No Storage Room",
-                //         status: false,
-                //         data: null
-                //     }
-                // }
-                // getStorageRoom.forEach(async element => {
-                //     const getProduct = await ProductsInStock.find({
-                //         storage_Room_Id: element._id,
-                //         status: false,
-                //         stock_Status: "instock"
-                //     }).populate<{ product_Id: productType }>('product_Id');
-                //     // console.log(getProduct)
-                //     if (getProduct.length > 0) {
-                //         // console.log(getProduct)
-                //         productReport.push(getProduct)
-                //     }
-
-
-
-                // })
-                // console.log(productReport)
+                let newArray: {
+                    product: any,
+                    qty: number,
+                    unit_Price: number,
+                    amount: number,
+                    reciev_Date: Date,
+                    expire_At: Date
+                }[] = [];
+                const getOnhand = await ProductsInStock.find({
+                    stock_Status: "instock",
+                    status: false
+                }).populate({
+                    path: 'product_Id',
+                    select:
+                        'name',
+                });
+                getOnhand.forEach(element => {
+                    console.log(element)
+                    newArray.push({
+                        product: element.product_Id,
+                        qty: element.qty,
+                        unit_Price: element.unit_Price,
+                        amount: element.qty * element.unit_Price,
+                        reciev_Date: element.created_At,
+                        expire_At: element.expire_At
+                    });
+                    // console.log("in foreach",newArray)
+                })
+                if (getOnhand)
+                    return {
+                        message: "Run Report Success!",
+                        status: true,
+                        data: newArray
+                    }
+                // console.log(newArray)
             } catch (error) {
                 return {
                     message: error,
