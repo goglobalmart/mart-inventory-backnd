@@ -117,7 +117,7 @@ const purchase = {
                     storage_Room_Id: Types.ObjectId
                 }[] = [];
 
-                const purchase = await Purchase.findByIdAndUpdate(purchase_Id, input).exec();
+                const purchase = await Purchase.findByIdAndUpdate(purchase_Id, input).populate('storage_Room_Id items.product_Id').exec();
                 if (purchase) {
 
                     purchase.items.forEach(async item => {
@@ -162,7 +162,7 @@ const purchase = {
                         approve_status: status,
                         approve_By: new mongoose.Types.ObjectId(currentUser.uid)
                     }
-                ).exec();
+                ).populate('storage_Room_Id items.product_Id').exec();
                 if (purchase) {
                     await ProductsInStock.updateMany(
                         {
@@ -189,7 +189,7 @@ const purchase = {
         voidingPurchas: async (_root: undefined, { purchase_Id }: { purchase_Id: string, status: string }) => {
             // console.log(purchase_Id)
             try {
-                const purchase = await Purchase.findByIdAndUpdate(purchase_Id, { status: true }).exec();
+                const purchase = await Purchase.findByIdAndUpdate(purchase_Id, { status: true }).populate('storage_Room_Id items.product_Id').exec();
                 if (purchase) {
                     await ProductsInStock.updateMany(
                         {
@@ -221,7 +221,7 @@ const purchase = {
                     ...input,
                     approve_status: "instock",
                     receive_By: new mongoose.Types.ObjectId(currentUser.uid)
-                }).exec();
+                }).populate('storage_Room_Id items.product_Id').exec();
                 // console.log(getReceivePuchas)
                 if (getReceivePuchas) {
                     input.items.forEach(async item => {
