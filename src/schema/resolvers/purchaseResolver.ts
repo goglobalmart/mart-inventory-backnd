@@ -3,7 +3,8 @@ import { purchaseType } from '../../type/purchaseType';
 import ProductsInStock from '../../model/ProductsInStock';
 import mongoose, { Types } from "mongoose";
 import { numberingGenerator } from '../../util/fn';
-import authCheck from '../../helpers/auth'
+import authCheck from '../../helpers/auth';
+
 const purchaseLabels = {
     docs: "data",
     limit: "perPage",

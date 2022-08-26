@@ -63,7 +63,7 @@ const releaseCard = {
                         // release_By:
                     }
                 ).save();
-
+                releasProdut.populate('customer_Id release_By delivery_By items.product_Id');
                 if (releasProdut) {
                     return {
                         message: "Release Producte Createed!",
@@ -101,7 +101,7 @@ const releaseCard = {
         },
         updateReleaseCard: async (_root: undefined, { input }: { input: productReleaseType }) => {
             try {
-                const updateReleaseCard = await ProductRelease.findByIdAndUpdate(input.release_Card_Id, input).exec();
+                const updateReleaseCard = await ProductRelease.findByIdAndUpdate(input.release_Card_Id, input).populate('customer_Id release_By delivery_By items.product_Id').exec();
                 if (updateReleaseCard) {
                     return {
                         message: "Update Success!",
