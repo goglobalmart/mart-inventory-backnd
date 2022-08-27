@@ -67,18 +67,21 @@ const releaseCard = {
                 if (releasProdut) {
                     return {
                         message: "Release Producte Createed!",
-                        status: true
+                        status: true,
+                        data: releasProdut
                     }
                 } else {
                     return {
                         message: "Cannot Create!",
-                        status: false
+                        status: false,
+                        data: null
                     }
                 }
             } catch (error: any) {
                 return {
                     message: error.message + "",
-                    status: false
+                    status: false,
+                    data: null
                 }
             }
         },
@@ -105,16 +108,22 @@ const releaseCard = {
                 if (updateReleaseCard) {
                     return {
                         message: "Update Success!",
-                        status: true
+                        status: true,
+                        data: updateReleaseCard
                     }
                 } else {
                     return {
                         message: "Cannot update!",
-                        status: false
+                        status: false,
+                        data: null
                     }
                 }
             } catch (error) {
-
+                return {
+                    message: error,
+                    data: null,
+                    status: false
+                }
             }
         },
         voidingReleaseCard: async (_root: undefined, { release_Card_Id }: { release_Card_Id: string }) => {
