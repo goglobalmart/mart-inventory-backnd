@@ -24,3 +24,13 @@ export interface productInstockType {
     expire_At: Date,
     created_At: Date
 }
+
+export interface productStockOutType {
+    product_Id: Types.ObjectId,
+    qty: number,
+    unit_Price: number,
+    storage_Room_Id: Types.ObjectId,
+    storage_Room_name: string,
+    key: Date,
+    product_name: string,
+}

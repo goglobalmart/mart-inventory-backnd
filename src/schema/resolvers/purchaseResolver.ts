@@ -28,7 +28,7 @@ const purchase = {
                     limit: limit || 10,
                     customLabels: purchaseLabels,
                     sort: {
-                        created_At: -1,
+                        numbering: -1,
                     },
                     populate: "storage_Room_Id purchase_By receive_By approve_By supplier_id items.product_Id",
 
@@ -80,7 +80,7 @@ const purchase = {
                     _id: new mongoose.Types.ObjectId(),
                     numbering,
                     purchase_By: new mongoose.Types.ObjectId(currentUser.uid)
-                }).save()
+                }).save();
                 purchase.populate('storage_Room_Id items.product_Id');
                 if (purchase) {
                     input.items.forEach(element => {

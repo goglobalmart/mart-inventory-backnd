@@ -3,7 +3,7 @@ import Product from '../../model/Product';
 import ProductRelease from '../../model/ProductRelease';
 import ProductsInStock from '../../model/ProductsInStock'
 import { productReleaseType } from '../../type/productReleaseType';
-import { ReleaseProductMessage } from '../../util/fn';
+import { ProductFifoCheck, ProductFifo } from '../../util/fn';
 import authCheck from '../../helpers/auth';
 import { numberingGenerator } from '../../util/fn';
 
@@ -28,7 +28,7 @@ const releaseCard = {
                     limit: limit || 10,
                     customLabels: releaseProductLabels,
                     sort: {
-                        created_At: -1,
+                        numbering: -1,
                     },
                     populate: "items.storage_Room_Id release_By customer_Id delivery_By items.product_Id",
 
@@ -86,20 +86,28 @@ const releaseCard = {
             }
         },
         delivered: async (_root: undefined, { release_Card_Id, input }: { release_Card_Id: string, input: productReleaseType }) => {
-            // const getReleaseProducts = await ProductRelease.findById(release_Card_Id).exec();
-            const getMess = new ReleaseProductMessage(input?.items);
-            const messageCheck = await getMess.getMessage();
-            if (messageCheck === "Release Product Created!") {
-                await ProductRelease.findByIdAndUpdate(release_Card_Id, { delivery: true, items: input.items }).exec();
-                return {
-                    message: messageCheck,
-                    status: true
-                }
-            } else {
-                return {
-                    message: messageCheck,
-                    status: false
-                }
+
+            try {
+                const fifoCheck = await new ProductFifoCheck();
+                const checkProductInstock = await fifoCheck.stockNotEnough(input.items);
+                if (checkProductInstock.status)
+                    return {
+                        message: checkProductInstock?.message,
+                        status: false,
+                        data: null
+                    }
+
+                // console.log("checkProductInstock", checkProductInstock)
+                const checkfifo = await fifoCheck.getData(input.items);
+                if (checkfifo)
+                    return {
+                        message: "delivered",
+                        status: true,
+                        data: null
+                    }
+
+            } catch (error) {
+                return error
             }
         },
         updateReleaseCard: async (_root: undefined, { input }: { input: productReleaseType }) => {
