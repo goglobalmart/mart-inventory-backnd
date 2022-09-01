@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 
 export interface productType {
+    _id: Types.ObjectId,
     product_Id: Types.ObjectId,
     name: string,
     cost: number,

@@ -7,6 +7,7 @@ export interface productReleaseType {
     delivery_By: Types.ObjectId,
     release_Card_Id: String,
     delivery: Boolean,
+    status: Boolean,
     numbering: string,
     delivery_Date: Date,
     order_Date: Date,

@@ -25,6 +25,9 @@ const purchase = gql`
         purchase_Id: Purchase
         key: DataTime
         storage_Room_Id: StorageRoom
+        created_At: DataTime
+        stock_Status: String
+        valua: Float
     }
     type purchaseMessage {
         message: String

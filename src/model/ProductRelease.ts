@@ -8,6 +8,7 @@ const productReleaseSchema = new Schema<productReleaseType>({
     release_By: { type: Schema.Types.ObjectId, ref: 'User' },
     delivery_By: { type: Schema.Types.ObjectId, ref: 'User' },
     numbering: String,
+    status: { type: Boolean, default: false },
     delivery: { type: Boolean, default: false },
     delivery_Date: Date,
     order_Date: Date,

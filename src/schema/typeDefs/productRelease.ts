@@ -5,6 +5,7 @@ const productRelease = gql`
         _id: ID
         customer_Id: Customer
         delivery: Boolean
+        status: Boolean
         release_By: User
         delivery_By: User
         storage_Room_Id: StorageRoom
