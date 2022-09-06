@@ -4,11 +4,9 @@ import authCheck from '../../helpers/auth'
 const customer = {
     Query: {
         getAllCustomer: async (_root: undefined, { keyword }: { keyword: string }, { req }: { req: any }) => {
-
             await authCheck(req.headers.authorization);
             try {
                 const get = await Customer.find({ name: { $regex: keyword } }).exec();
-                // console.log(get)
                 return get
             } catch (error) {
                 return {

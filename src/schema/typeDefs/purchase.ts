@@ -15,6 +15,7 @@ const purchase = gql`
         approve_status: String
         priority: String
         status: Boolean
+        receive_Date: DataTime
         created_At: DataTime
     }
     type Items {

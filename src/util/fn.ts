@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import ProductsInStock from '../model/ProductsInStock';
 import Product from '../model/Product';
 import StorageRoom from '../model/StorageRoom'
-import { productInstockType, productType, productStockOutType } from "../type/productType";
-import { assertWrappingType } from 'graphql';
+import { productType, productStockOutType } from "../type/productType";
+import ProductRelease from '../model/ProductRelease';
 
 export const numberingGenerator = (numbering: number) => {
     let str = "" + numbering;
@@ -285,7 +285,6 @@ export class ProductFifoCheck {
                         storage_Room_Id: new mongoose.Types.ObjectId(element?.storage_Room_Id)
                     }
                 ).sort({ created_At: 1 }).exec();
-                // console.log(allItem)
                 let listQty: Array<number> = [];
                 for (const item of allItem) {
                     listQty.push(item.qty)
@@ -295,8 +294,7 @@ export class ProductFifoCheck {
                     (previousValue, currentValue) => previousValue + currentValue,
                     initialValue
                 );
-                console.log("TotalInsockItemQty", TotalInsockItemQty)
-                console.log("Qty need", element?.qty)
+
                 if (TotalInsockItemQty < element?.qty) {
                     this.message = `${getStorage_Room?.name} don't hav Enough ${getProduct?.name}, Total in Stock: ${TotalInsockItemQty}!`
                     return true
@@ -324,7 +322,7 @@ export class ProductFifoCheck {
 
     }
 
-    public async getData(productNeed: any) {
+    public async getData(productNeed: any, release_Card_Id: string) {
         await Promise.all(
             productNeed.map(async (element: productStockOutType) => {
 
@@ -338,35 +336,71 @@ export class ProductFifoCheck {
                     }
                 ).sort({ created_At: 1 }).exec();
 
+                console.log("allItem", allItem)
+
                 await Promise.all(
                     allItem.map(async (item: any) => {
+
                         if (item.qty == this.QtyNeed) {
                             await ProductsInStock.findByIdAndUpdate(item._id, {
                                 qty: 0,
                                 stock_Out: item.qty,
                                 stock_Status: "stockOut"
                             }).exec()
+
+                            await ProductRelease.findByIdAndUpdate(
+                                release_Card_Id,
+                                {
+                                    $push: {
+                                        stock_Record: {
+                                            instock_Id: item._id,
+                                            qty: item.qty
+                                        }
+                                    }
+                                }
+                            ).exec()
+
                             console.log(`instock: ${item.qty}=>Update: qty=${0},stockSatuse="stockOut", stockOut=${item.qty} | this.QtyNeed=${0}`)
-                            this.QtyNeed = 0
-                            // return `instock: ${item.qty}=>Update: qty=${0},stockSatuse="stockOut", stockOut=${item.qty} | this.QtyNeed=${0}`
+                            this.QtyNeed = 0;
                         }
                         else if (item.qty > this.QtyNeed && this.QtyNeed != 0) {
                             await ProductsInStock.findByIdAndUpdate(item._id, {
                                 qty: item.qty - this.QtyNeed,
                                 stock_Out: this.QtyNeed,
                             }).exec()
+                            await ProductRelease.findByIdAndUpdate(
+                                release_Card_Id, {
+                                $push: {
+                                    stock_Record: {
+                                        instock_Id: item._id,
+                                        qty: this.QtyNeed
+                                    }
+                                }
+                            }
+                            ).exec()
                             console.log(`instock: ${item.qty}=>Update: qty=${item.qty - this.QtyNeed}, stockOut=${this.QtyNeed} | this.QtyNeed=${0}`)
                             this.QtyNeed = 0
-                            // return `instock: ${item.qty}=>Update: qty=${item.qty - this.QtyNeed}, stockOut=${this.QtyNeed} | this.QtyNeed=${0}`
                         }
+
                         else if (item.qty < this.QtyNeed) {
                             await ProductsInStock.findByIdAndUpdate(item._id, {
                                 qty: 0,
                                 stock_Out: item.qty,
+                                stock_Status: "stockOut"
                             }).exec()
+                            await ProductRelease.findByIdAndUpdate(
+                                release_Card_Id, {
+                                $push: {
+                                    stock_Record: {
+                                        instock_Id: item._id,
+                                        qty: item.qty
+                                    }
+                                }
+                            }
+                            ).exec()
+
                             console.log(`instock: ${item.qty}=>Update: qty=${0},stockSatuse="stockOut" stockOut=${item.qty} | this.QtyNeed=${this.QtyNeed - item.qty}`)
                             this.QtyNeed = this.QtyNeed - item.qty
-                            // return `instock: ${item.qty}=>Update: qty=${0},stockSatuse="stockOut" stockOut=${item.qty} | this.QtyNeed=${this.QtyNeed - item.qty}`
                         }
                         else {
                             console.log("Run else", this.QtyNeed)

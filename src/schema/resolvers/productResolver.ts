@@ -1,6 +1,5 @@
 import { productType } from '../../type/productType';
 import Product from '../../model/Product';
-// import mongoose from 'mongoose';
 
 const productLabels = {
     docs: "data",
@@ -81,10 +80,8 @@ const productResolver = {
             }
         },
         updateProduct: async (_root: undefined, { input }: { input: productType }) => {
-            // console.log(input.product_Id)
+            
             try {
-                // const productUpdate = await Product.findById(input.product_Id).exec()
-                // console.log(productUpdate)
                 const isUpdate = await Product.findByIdAndUpdate(input.product_Id, input).exec();
                 if (!isUpdate) {
                     return {

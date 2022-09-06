@@ -11,6 +11,7 @@ const productSchema = new Schema<productType>({
     type: String,
     feature: String,
     unit: String,
+    bar_Code: String,
     created_At: { type: Date, default: new Date() }
 })
 

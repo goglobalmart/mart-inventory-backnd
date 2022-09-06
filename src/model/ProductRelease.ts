@@ -3,7 +3,6 @@ import { productReleaseType } from '../type/productReleaseType';
 import paginate from 'mongoose-paginate-v2';
 
 const productReleaseSchema = new Schema<productReleaseType>({
-    // _id: { type: Schema.Types.ObjectId },
     customer_Id: { type: Schema.Types.ObjectId, ref: 'Customer' },
     release_By: { type: Schema.Types.ObjectId, ref: 'User' },
     delivery_By: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -20,6 +19,10 @@ const productReleaseSchema = new Schema<productReleaseType>({
         storage_Room_name: String,
         key: Date,
         product_name: String
+    }],
+    stock_Record: [{
+        instock_Id: { type: Schema.Types.ObjectId, ref: 'ProductsInStock' },
+        qty: { type: Number, default: 0 }
     }],
     remark: String,
     created_At: { type: Date, default: new Date() }

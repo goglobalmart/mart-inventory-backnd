@@ -13,10 +13,7 @@ const unitResolver = {
                 }
             }
         },
-        // getUnitFindBykeyword:(_root:undefined,{keyword}:{keyword:String})=>{
-        //     const get = await Unit.find({name{$regex:keyword}})
-        // }
-        
+              
     },
     Mutation:{
         createUnit:async(_root:undefined,{input}:{input:unitType})=>{

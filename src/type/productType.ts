@@ -11,6 +11,7 @@ export interface productType {
     type: string,
     feature: string,
     unit: string,
+    bar_Code: string,
     created_At: Date
 }
 export interface productInstockType {

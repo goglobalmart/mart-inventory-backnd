@@ -23,5 +23,11 @@ export interface productReleaseType {
             product_name: string
         }
     ],
+    stock_Record: [
+        {
+            instock_Id: Types.ObjectId,
+            qty: number,
+        }
+    ],
     created_At: Date
 }

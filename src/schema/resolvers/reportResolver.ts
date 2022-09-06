@@ -5,127 +5,160 @@ import ProductRelease from '../../model/ProductRelease';
 
 const reportResolver = {
     Query: {
-        getStockOnHand: async (_root: undefined, { }: {}) => {
+        getStockInReport: async (_root: undefined, { to, from }: { to: string, from: string }) => {
+
             try {
-                let newArray: {
-                    product: any,
-                    qty: number,
-                    unit_Price: number,
-                    amount: number,
-                    reciev_Date: Date,
-                    expire_At: Date
-                }[] = [];
-                const getOnhand = await ProductsInStock.find({
-                    stock_Status: "instock",
-                    status: false
-                }).populate({
-                    path: 'product_Id',
-                    select:
-                        'name',
-                });
-                getOnhand.forEach(element => {
-                    console.log(element)
-                    newArray.push({
-                        product: element.product_Id,
-                        qty: element.qty,
-                        unit_Price: element.unit_Price,
-                        amount: element.qty * element.unit_Price,
-                        reciev_Date: element.created_At,
-                        expire_At: element.expire_At
-                    });
-                    // console.log("in foreach",newArray)
-                })
-                if (getOnhand)
-                    return {
-                        message: "Run Report Success!",
-                        status: true,
-                        data: newArray
+                // console.log("to", to)
+                // console.log("from", from)
+                let queryFrom = from.trim().length === 0 ? {} : { receive_Date: { $gte: new Date(from) } }
+                let queryTo = to.trim().length === 0 ? {} : { receive_Date: { $lte: new Date(to) } };
+
+                const getPurchas = await Purchase.aggregate([
+                    { $match: { status: false } },
+                    { $match: { approve_status: "instock" } },
+                    { $match: queryFrom },
+                    { $match: queryTo },
+                    {
+                        $unwind: { path: "$items" }
+                    },
+                    {
+                        $lookup: {
+                            from: "products",
+                            localField: "items.product_Id",
+                            foreignField: "_id",
+                            as: "product"
+                        }
+                    },
+                    {
+                        $unwind: { path: "$product", preserveNullAndEmptyArrays: true }
+                    },
+                    {
+                        $lookup: {
+                            from: "suppliers",
+                            localField: "supplier_id",
+                            foreignField: "_id",
+                            as: "vendor"
+                        }
+                    },
+                    {
+                        $unwind: { path: "$vendor", preserveNullAndEmptyArrays: true }
+                    },
+                    { $sort: { receive_Date: 1 } }
+                ]);
+                const data: any = getPurchas.map(pur => {
+                    let obj = {
+                        _id: pur._id,
+                        date: pur.receive_Date,
+                        item: pur.product.name,
+                        unit: pur.product.unit,
+                        amount: pur.items.qty * pur.items.unit_Price,
+                        qty: pur.items.qty,
+                        unit_Price: pur.items.unit_Price,
+                        vendor: pur.vendor.name
                     }
-                // console.log(newArray)
+                    return obj
+                })
+
+                return data
             } catch (error) {
-                return {
-                    message: error,
-                    status: false,
-                    data: null
-                }
+                return error
             }
         },
-        getStockReport: async (_root: undefined, { }: {}) => {
+        getStockOutReport: async (_root: undefined, { to, from }: { to: string, from: string }) => {
+
+            try {
+                let queryFrom = from.trim().length === 0 ? {} : { delivery_Date: { $gte: new Date(from) } }
+                let queryTo = to.trim().length === 0 ? {} : { delivery_Date: { $lte: new Date(to) } };
+
+                const getStockOut = await ProductRelease.aggregate([
+                    { $match: { status: false } },
+                    { $match: { delivery: true } },
+                    { $match: queryFrom },
+                    { $match: queryTo },
+                    {
+                        $unwind: { path: "$items" }
+                    },
+                    {
+                        $lookup: {
+                            from: "products",
+                            localField: "items.product_Id",
+                            foreignField: "_id",
+                            as: "product"
+                        }
+                    },
+                    {
+                        $unwind: { path: "$product", preserveNullAndEmptyArrays: true }
+                    },
+                    {
+                        $lookup: {
+                            from: "customers",
+                            localField: "customer_Id",
+                            foreignField: "_id",
+                            as: "customer"
+                        }
+                    },
+                    {
+                        $unwind: { path: "$customer", preserveNullAndEmptyArrays: true }
+                    }
+                ]);
+                // console.log(getStockOut)
+                const data = getStockOut.map(pur => {
+                    let obj = {
+                        _id: pur._id,
+                        date: pur.delivery_Date,
+                        item: pur.product.name,
+                        unit: pur.product.unit,
+                        amount: pur.items.qty * pur.items.unit_Price,
+                        qty: pur.items.qty,
+                        unit_Price: pur.items.unit_Price,
+                        customer: pur.customer.name
+                    }
+                    return obj
+                })
+                console.log(data)
+                return data
+            } catch (error) {
+                return error
+            }
+        },
+        getStockOnhandReport: async (_root: undefined, { }: {}) => {
             try {
 
-
                 const getAllProduct = await Product.find().exec();
-
-                const producStock = await Promise.all(getAllProduct.map(async (element: any) => {
-                    const getReleaseProduct = await ProductRelease.aggregate([
-                        // { $match: { status: false } },
-                        { $match: { delivery: false } },
-                        // { $unwind: "$items" },
-                        // { $match: { 'items.product_Id': element._id } },
-                        // {
-                        //     $lookup:
-                        //     {
-                        //         from: "storagerooms",
-                        //         localField: "storage_Room_Id",
-                        //         foreignField: "_id",
-                        //         as: "storage_Room"
-                        //     }
-                        // }
-                    ]);
-                    console.log(getReleaseProduct)
-                    const getProduct = await Purchase.aggregate([
-                        { $match: { approve_status: 'instock' } },
-                        { $match: { status: false } },
-                        { $unwind: "$items" },
-                        { $match: { 'items.product_Id': element._id } },
+                const getProductsInStockDetail: any = await Promise.all(getAllProduct.map(async (element: any) => {
+                    const getproductInStock = await ProductsInStock.find(
                         {
-                            $lookup:
-                            {
-                                from: "storagerooms",
-                                localField: "storage_Room_Id",
-                                foreignField: "_id",
-                                as: "storage_Room"
-                            }
-                        },
-                        {
-                            $lookup:
-                            {
-                                from: "users",
-                                localField: "receive_By",
-                                foreignField: "_id",
-                                as: "receive_By"
-                            }
-                        },
-                        { $unwind: "$receive_By" },
-                        { $unwind: "$storage_Room" }
-                    ]);
-                    const getFinalProduct = getProduct.map(pro => {
-                        const xValua: number = pro.items.qty * pro.items.unit_Price;
-                        const valuaOje = {
-                            valua: xValua
+                            product_Id: element._id,
+                            status: false,
+                            stock_Status: "instock"
                         }
-                        const newVal = {
-                            ...valuaOje,
-                            ...pro.items
-                        }
-                        const finalVal = {
-                            item: newVal
-                        }
-                        const finalRes = {
-                            ...pro,
-                            ...finalVal
-                        }
-                        // console.log(finalRes)
-                        return finalRes
+                    ).exec()
+                    const getQtyTotal: any = getproductInStock.map((pro: { qty: any; }) => {
+                        return pro.qty
                     })
-                    if (getFinalProduct.length != 0)
+                    const getAmountTotal: any = getproductInStock.map((pro: { unit_Price: any; qty: any }) => {
+                        return pro.unit_Price * pro.qty;
+                    })
+                    const initialValue = 0;
+                    const TotalInsockItemQty = getQtyTotal.reduce(
+                        (previousValue: any, currentValue: any) => previousValue + currentValue,
+                        initialValue
+                    );
+
+                    const TotalInsockItemUnitPrice = getAmountTotal.reduce(
+                        (previousValue: any, currentValue: any) => previousValue + currentValue,
+                        initialValue
+                    );
+                    if (getproductInStock.length != 0)
                         return {
                             productName: element.name,
-                            stock_Detail: getFinalProduct
+                            unit: element.unit,
+                            stock_Detail: getproductInStock,
+                            total_Qty: TotalInsockItemQty,
+                            total_Amount: TotalInsockItemUnitPrice
                         }
-
                 }))
-                const getFinal = producStock.filter(product => product != undefined);
+                const getFinal = getProductsInStockDetail.filter((product: any) => product != undefined);
                 return {
                     message: "Get report Success!",
                     status: true,

@@ -1,11 +1,9 @@
-import mongoose from 'mongoose';
-import Product from '../../model/Product';
 import ProductRelease from '../../model/ProductRelease';
-import ProductsInStock from '../../model/ProductsInStock'
 import { productReleaseType } from '../../type/productReleaseType';
-import { ProductFifoCheck, ProductFifo } from '../../util/fn';
+import { ProductFifoCheck } from '../../util/fn';
 import authCheck from '../../helpers/auth';
 import { numberingGenerator } from '../../util/fn';
+import ProductsInStock from '../../model/ProductsInStock';
 
 const releaseProductLabels = {
     docs: "data",
@@ -97,14 +95,19 @@ const releaseCard = {
                         data: null
                     }
 
-                // console.log("checkProductInstock", checkProductInstock)
-                const checkfifo = await fifoCheck.getData(input.items);
-                if (checkfifo)
+                const checkfifo = await fifoCheck.getData(input.items, release_Card_Id);
+                if (checkfifo) {
+                    await ProductRelease.findByIdAndUpdate(release_Card_Id, {
+                        delivery: true,
+                        // delivery_Date: new Date()
+                    }).exec();
                     return {
                         message: "delivered",
                         status: true,
                         data: null
                     }
+                }
+
 
             } catch (error) {
                 return error
@@ -136,9 +139,34 @@ const releaseCard = {
         },
         voidingReleaseCard: async (_root: undefined, { release_Card_Id }: { release_Card_Id: string }) => {
             try {
+                const findReleasCard = await ProductRelease.findById(release_Card_Id).exec();
+                findReleasCard?.stock_Record.forEach(async (element: any) => {
+                    const getStockout = await ProductsInStock.findById(element.instock_Id).exec();
+                    await ProductsInStock.findByIdAndUpdate(
+                        element.instock_Id,
+                        {
+                            qty: getStockout?.qty + element?.qty
+                        }
+                    ).exec();
+                });
+                const release = await ProductRelease.findByIdAndUpdate(
+                    release_Card_Id,
+                    {
+                        status: true
+                    }
+                ).exec();
 
+                return {
+                    message: "Void Success!",
+                    status: true,
+                    data: release
+                }
             } catch (error) {
-
+                return {
+                    message: error,
+                    status: false,
+                    data: null
+                }
             }
         }
     }

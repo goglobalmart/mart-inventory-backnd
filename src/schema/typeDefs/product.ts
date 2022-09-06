@@ -12,6 +12,7 @@ const product = gql`
         type: String
         feature: String
         unit: String
+        bar_Code: String
         created_At: DataTime
     }
     type productMessage {
@@ -44,6 +45,7 @@ const product = gql`
         remark: String
         type: String
         feature: String
+        bar_Code: String
         unit: String
     }
     input updateProductInput {
@@ -55,6 +57,7 @@ const product = gql`
         remark: String
         type: String
         feature: String
+        bar_Code: String
         unit: String
     }
     type Query {
@@ -65,7 +68,6 @@ const product = gql`
         createProduct(input: createProductInput!): productMessage!
         updateProduct(input: updateProductInput!): productMessage!
         deleteProduct(product_Id: String!): productMessage!
-
     }
 `
 export default product

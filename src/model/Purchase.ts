@@ -19,9 +19,10 @@ const purchaseSchema = new Schema<purchaseType>({
         qty: Number,
         unit_Price: Number,
         key: { type: Date },
-        
+
     }],
     remark: String,
+    receive_Date: Date,
     created_At: { type: Date, default: new Date() }
 })
 

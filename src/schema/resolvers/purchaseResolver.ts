@@ -4,6 +4,7 @@ import ProductsInStock from '../../model/ProductsInStock';
 import mongoose, { Types } from "mongoose";
 import { numberingGenerator } from '../../util/fn';
 import authCheck from '../../helpers/auth';
+import Product from '../../model/Product';
 
 const purchaseLabels = {
     docs: "data",
@@ -93,6 +94,7 @@ const purchase = {
                             }
                         );
                         newArray.push(finalResult);
+
                     });
                     await ProductsInStock.insertMany(newArray)
                     return {
@@ -216,17 +218,23 @@ const purchase = {
         },
         receivePuchaseingProduct: async (_root: undefined, { input }: { input: purchaseType }, { req }: { req: any }) => {
             const currentUser = await authCheck(req.headers.authorization);
-            // console.log("Reciev : ", input.items)
+
+            let today = new Date();
+            let year = today.getFullYear();
+            let month = today.getMonth() + 1;
+            let dt = today.getDate();
+            let newDay: string = dt < 10 ? '0' + String(dt) : String(dt)
+            let newMonth: string = month < 10 ? '0' + String(month) : String(month)
+
             try {
                 const getReceivePuchas = await Purchase.findByIdAndUpdate(input._id, {
                     ...input,
                     approve_status: "instock",
-                    receive_By: new mongoose.Types.ObjectId(currentUser.uid)
+                    receive_By: new mongoose.Types.ObjectId(currentUser.uid),
+                    receive_Date: year + '-' + newMonth + '-' + newDay
                 }).populate('storage_Room_Id items.product_Id').exec();
-                // console.log(getReceivePuchas)
                 if (getReceivePuchas) {
                     input.items.forEach(async item => {
-                        // console.log(item)
                         await ProductsInStock.updateMany(
                             { purchase_Id: input._id, product_Id: item.product_Id },
                             {
@@ -238,6 +246,13 @@ const purchase = {
                                 qty: item.qty
                             }
                         );
+                        console.log(item.qty)
+                        await Product.findByIdAndUpdate(
+                            item.product_Id,
+                            {
+                                qty: item.qty
+                            }
+                        ).exec();
 
                     })
                     return {

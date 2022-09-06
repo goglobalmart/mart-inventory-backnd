@@ -12,6 +12,7 @@ export interface purchaseType {
     approve_status: string,
     priority: string,
     status: boolean,
+    receive_Date: Date,
     items: [{
         _id: Types.ObjectId,
         product_Id: Types.ObjectId,
