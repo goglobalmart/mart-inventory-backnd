@@ -28,10 +28,22 @@ const report = gql`
         status: Boolean
         data: [StockOnHand]
     }
+    type TotalUserMessage {
+        customer: Float
+        supplier: Float
+    }
     type Query {
         getStockOnhandReport: getReportMessage!
         getStockInReport(from: String!, to: String!): [getStockReport!]!
         getStockOutReport(from: String!, to: String!): [getStockReport!]!
+        getQtyInHand: Float!
+        getQtyWillReceived: Float!
+        getTotalUser: TotalUserMessage!
+        getLowStockItems: Float!
+        getNoItems: Float!
+        getNoPurchase: Float!
+        getTotalCost: Float!
+        getTotalCancelOrder: Float!
     }
 `
 export default report

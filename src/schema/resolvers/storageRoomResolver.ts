@@ -1,3 +1,4 @@
+import Purchase from '../../model/Purchase';
 import StorageRoom from '../../model/StorageRoom'
 import { storageRoomType } from '../../type/storageRoomType';
 const storageRoomResolver = {
@@ -57,17 +58,19 @@ const storageRoomResolver = {
         },
         deleteStorageRoom: async (_root: undefined, { StorageRoomId }: { StorageRoomId: storageRoomType }) => {
             try {
-                const isDelete = await StorageRoom.findByIdAndDelete(StorageRoomId)
-                if (!isDelete) {
-                    return {
-                        message: "Delete storage room failse",
-                        status: false
-                    }
-                }
-                return {
-                    message: "Delete Storage Room Success",
-                    status: true
-                }
+                // const isDelete = await StorageRoom.findByIdAndDelete(StorageRoomId);
+                const getPurchase = await Purchase.find({ StorageRoomId }).exec();
+                console.log(getPurchase)
+                // if (!isDelete) {
+                //     return {
+                //         message: "Delete storage room failse",
+                //         status: false
+                //     }
+                // }
+                // return {
+                //     message: "Delete Storage Room Success",
+                //     status: true
+                // }
             } catch (error) {
                 return {
                     message: error,

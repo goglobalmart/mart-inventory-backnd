@@ -190,8 +190,18 @@ const purchase = {
             }
         },
         voidingPurchas: async (_root: undefined, { purchase_Id }: { purchase_Id: string, status: string }) => {
-            // console.log(purchase_Id)
             try {
+                const getProductOutStock = await ProductsInStock.find({
+                    stock_Status: "stockOut",
+                    purchase_Id: purchase_Id
+                }).exec();
+                if (getProductOutStock.length > 0) {
+                    return {
+                        message: `Product in this Purchase has been sold! Cannot void!`,
+                        status: false,
+                        data: null
+                    }
+                }
                 const purchase = await Purchase.findByIdAndUpdate(purchase_Id, { status: true }).populate('storage_Room_Id items.product_Id').exec();
                 if (purchase) {
                     await ProductsInStock.updateMany(
@@ -246,14 +256,12 @@ const purchase = {
                                 qty: item.qty
                             }
                         );
-                        console.log(item.qty)
                         await Product.findByIdAndUpdate(
                             item.product_Id,
                             {
-                                qty: item.qty
+                                cost: item.unit_Price
                             }
                         ).exec();
-
                     })
                     return {
                         message: "Purchase Received!",

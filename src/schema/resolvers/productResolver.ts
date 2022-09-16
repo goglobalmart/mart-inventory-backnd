@@ -1,5 +1,6 @@
 import { productType } from '../../type/productType';
 import Product from '../../model/Product';
+import ProductsInStock from '../../model/ProductsInStock';
 
 const productLabels = {
     docs: "data",
@@ -56,6 +57,44 @@ const productResolver = {
                     status: false
                 }
             }
+        },
+        getLessProductInstock: async (_root: undefined, { }) => {
+            try {
+                const getProduct = await Product.find().exec();
+
+                const getProductStock = await Promise.all(
+                    getProduct.map(async (pro: any) => {
+                        // console.log(pro)
+                        const getStock = await ProductsInStock.find({
+                            product_Id: pro._id,
+                            stock_Status: "instock",
+                            status: false
+                        });
+                        const getQtyTotal: any = getStock.map((pro: { qty: any; }) => {
+                            return pro.qty
+                        });
+                        const initialValue = 0;
+                        const TotalInsockItemQty = getQtyTotal.reduce(
+                            (previousValue: any, currentValue: any) => previousValue + currentValue,
+                            initialValue
+                        );
+                        // console.log(TotalInsockItemQty)
+                        return {
+                            name: pro.name,
+                            qty: TotalInsockItemQty,
+                            image_src: pro.image_src,
+                            unit: pro.unit
+                        }
+                    })
+                )
+
+                // const newData: any = getProductStock.sort((a: any, b: any) => (a.qty < b.qty) ? -1 : 1);
+
+
+            } catch (error) {
+                return error
+            }
+
         }
     },
     Mutation: {
@@ -80,7 +119,7 @@ const productResolver = {
             }
         },
         updateProduct: async (_root: undefined, { input }: { input: productType }) => {
-            
+
             try {
                 const isUpdate = await Product.findByIdAndUpdate(input.product_Id, input).exec();
                 if (!isUpdate) {

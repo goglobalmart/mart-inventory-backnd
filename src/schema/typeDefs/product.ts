@@ -15,6 +15,12 @@ const product = gql`
         bar_Code: String
         created_At: DataTime
     }
+    type LessProductInStcok {
+        name: String
+        qty: Float
+        image_src: String
+        unit: String
+    }
     type productMessage {
         message: String
         status: Boolean
@@ -63,6 +69,7 @@ const product = gql`
     type Query {
         getAllProduct: [ Product! ]
         getProductsPagination( page: Int!,limit: Int!, keyword: String!, category: String! ): getProductsPaginationMessage!
+        getLessProductInstock: [LessProductInStcok!]!
     }
     type Mutation {
         createProduct(input: createProductInput!): productMessage!

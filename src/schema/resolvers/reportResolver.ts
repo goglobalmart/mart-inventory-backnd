@@ -2,14 +2,13 @@ import ProductsInStock from '../../model/ProductsInStock';
 import Product from '../../model/Product';
 import Purchase from '../../model/Purchase';
 import ProductRelease from '../../model/ProductRelease';
+import Customer from '../../model/Customer';
+import Supplier from '../../model/Supplier';
 
 const reportResolver = {
     Query: {
         getStockInReport: async (_root: undefined, { to, from }: { to: string, from: string }) => {
-
             try {
-                // console.log("to", to)
-                // console.log("from", from)
                 let queryFrom = from.trim().length === 0 ? {} : { receive_Date: { $gte: new Date(from) } }
                 let queryTo = to.trim().length === 0 ? {} : { receive_Date: { $lte: new Date(to) } };
 
@@ -101,7 +100,6 @@ const reportResolver = {
                         $unwind: { path: "$customer", preserveNullAndEmptyArrays: true }
                     }
                 ]);
-                // console.log(getStockOut)
                 const data = getStockOut.map(pur => {
                     let obj = {
                         _id: pur._id,
@@ -115,7 +113,6 @@ const reportResolver = {
                     }
                     return obj
                 })
-                console.log(data)
                 return data
             } catch (error) {
                 return error
@@ -123,7 +120,6 @@ const reportResolver = {
         },
         getStockOnhandReport: async (_root: undefined, { }: {}) => {
             try {
-
                 const getAllProduct = await Product.find().exec();
                 const getProductsInStockDetail: any = await Promise.all(getAllProduct.map(async (element: any) => {
                     const getproductInStock = await ProductsInStock.find(
@@ -158,11 +154,11 @@ const reportResolver = {
                             total_Amount: TotalInsockItemUnitPrice
                         }
                 }))
-                const getFinal = getProductsInStockDetail.filter((product: any) => product != undefined);
+                // const getFinal = getProductsInStockDetail.filter((product: any) => product != undefined);
                 return {
                     message: "Get report Success!",
                     status: true,
-                    data: getFinal
+                    data: getProductsInStockDetail
                 }
             } catch (error) {
                 return {
@@ -170,6 +166,116 @@ const reportResolver = {
                     status: false,
                     data: null
                 }
+            }
+        },
+        getQtyInHand: async () => {
+            const getproductInStock = await ProductsInStock.find(
+                {
+                    status: false,
+                    stock_Status: "instock"
+                }
+            ).exec();
+            let listQty: Array<number> = [];
+            getproductInStock.forEach(instock => {
+                listQty.push(instock.qty)
+            })
+            const initialValue = 0;
+            const TotalInsockItemUnitPrice = listQty.reduce(
+                (previousValue: any, currentValue: any) => previousValue + currentValue,
+                initialValue
+            );
+            return TotalInsockItemUnitPrice;
+        },
+        getQtyWillReceived: async () => {
+
+            const getSPurchase = await Purchase.aggregate([
+                { $match: { status: false } },
+                { $match: { approve_status: "approve" } },
+            ]);
+
+            const getPur: any = getSPurchase.map(pru => {
+                let listQty: Array<number> = [];
+
+                pru.items.forEach((e: any) => listQty.push(e.qty))
+                const initialValue = 0;
+                const TotalInsockItemUnitPrice = listQty.reduce(
+                    (previousValue: any, currentValue: any) => previousValue + currentValue,
+                    initialValue
+                );
+                return TotalInsockItemUnitPrice
+            })
+
+            const initialValue = 0;
+            const TotalItemsInPuchas = getPur.reduce(
+                (previousValue: any, currentValue: any) => previousValue + currentValue,
+                initialValue
+            );
+            return TotalItemsInPuchas
+        },
+        getTotalUser: async () => {
+            const getCustomers = await Customer.find().exec();
+            const getSupplier = await Supplier.find().exec();
+            return {
+                customer: getCustomers.length,
+                supplier: getSupplier.length
+            }
+        },
+        getNoItems: async () => {
+            const getPro = await Product.find().exec();
+            return getPro.length
+        },
+        getNoPurchase: async () => {
+            const getPro = await Purchase.find({ status: false }).exec();
+            return getPro.length
+        },
+        getTotalCost: async () => {
+            const getproductInStock = await ProductsInStock.find(
+                {
+                    status: false,
+                    stock_Status: "instock"
+                }
+            ).exec();
+            let listQty: Array<number> = [];
+            getproductInStock.forEach(instock => {
+                listQty.push(instock.unit_Price)
+            })
+            const initialValue = 0;
+            const TotalInsockItemUnitPrice = listQty.reduce(
+                (previousValue: any, currentValue: any) => previousValue + currentValue,
+                initialValue
+            );
+            return TotalInsockItemUnitPrice;
+        },
+        getTotalCancelOrder: async () => {
+            const getPro = await Purchase.find({ status: true }).exec();
+            return getPro.length
+        },
+        getLowStockItems: async () => {
+            try {
+                const getAllProduct = await Product.find().exec();
+                const getProductsInStockDetail: any = await Promise.all(getAllProduct.map(async (element: any) => {
+                    const getproductInStock = await ProductsInStock.find(
+                        {
+                            product_Id: element._id,
+                            status: false,
+                            stock_Status: "instock"
+                        }
+                    ).exec()
+                    const getQtyTotal: any = getproductInStock.map((pro: { qty: any; }) => {
+                        return pro.qty
+                    })
+
+                    const initialValue = 0;
+                    const TotalInsockItemQty = getQtyTotal.reduce(
+                        (previousValue: any, currentValue: any) => previousValue + currentValue,
+                        initialValue
+                    );
+
+                    return TotalInsockItemQty < 10 ? TotalInsockItemQty : 0
+                }))
+                return getProductsInStockDetail.length
+            } catch (error) {
+                return error
             }
         }
     }

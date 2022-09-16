@@ -336,7 +336,7 @@ export class ProductFifoCheck {
                     }
                 ).sort({ created_At: 1 }).exec();
 
-                console.log("allItem", allItem)
+                // console.log("allItem", allItem)
 
                 await Promise.all(
                     allItem.map(async (item: any) => {
