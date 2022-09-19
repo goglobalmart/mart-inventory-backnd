@@ -9,8 +9,9 @@ const productReleaseSchema = new Schema<productReleaseType>({
     numbering: String,
     status: { type: Boolean, default: false },
     delivery: { type: Boolean, default: false },
-    delivery_Date: Date,
-    order_Date: Date,
+    delivery_At: Date,
+    time: String,
+    // order_Date: Date,
     items: [{
         product_Id: { type: Schema.Types.ObjectId, ref: 'Product' },
         qty: Number,
@@ -25,7 +26,7 @@ const productReleaseSchema = new Schema<productReleaseType>({
         qty: { type: Number, default: 0 }
     }],
     remark: String,
-    created_At: { type: Date, default: new Date() }
+    order_Date: Date
 })
 
 productReleaseSchema.plugin(paginate);

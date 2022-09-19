@@ -11,7 +11,7 @@ const reportResolver = {
             try {
                 let queryFrom = from.trim().length === 0 ? {} : { receive_Date: { $gte: new Date(from) } }
                 let queryTo = to.trim().length === 0 ? {} : { receive_Date: { $lte: new Date(to) } };
-
+                // console.log("stocking", to, from)
                 const getPurchas = await Purchase.aggregate([
                     { $match: { status: false } },
                     { $match: { approve_status: "instock" } },
@@ -64,11 +64,11 @@ const reportResolver = {
             }
         },
         getStockOutReport: async (_root: undefined, { to, from }: { to: string, from: string }) => {
-
             try {
-                let queryFrom = from.trim().length === 0 ? {} : { delivery_Date: { $gte: new Date(from) } }
-                let queryTo = to.trim().length === 0 ? {} : { delivery_Date: { $lte: new Date(to) } };
-
+                // console.log("stock out", to, from)
+                let queryFrom = from.trim().length === 0 ? {} : { delivery_At: { $gte: new Date(from) } }
+                let queryTo = to.trim().length === 0 ? {} : { delivery_At: { $lte: new Date(to) } };
+              
                 const getStockOut = await ProductRelease.aggregate([
                     { $match: { status: false } },
                     { $match: { delivery: true } },
@@ -103,7 +103,7 @@ const reportResolver = {
                 const data = getStockOut.map(pur => {
                     let obj = {
                         _id: pur._id,
-                        date: pur.delivery_Date,
+                        date: pur.delivery_At,
                         item: pur.product.name,
                         unit: pur.product.unit,
                         amount: pur.items.qty * pur.items.unit_Price,
@@ -154,11 +154,11 @@ const reportResolver = {
                             total_Amount: TotalInsockItemUnitPrice
                         }
                 }))
-                // const getFinal = getProductsInStockDetail.filter((product: any) => product != undefined);
+                const getFinal = getProductsInStockDetail.filter((product: any) => product != undefined);
                 return {
                     message: "Get report Success!",
                     status: true,
-                    data: getProductsInStockDetail
+                    data: getFinal
                 }
             } catch (error) {
                 return {

@@ -29,7 +29,7 @@ const startServer = async () => {
 
     await apolloServer.start()
 
-    apolloServer.applyMiddleware({
+    apolloServer.applyMiddleware({ 
         app,
         path: '/api'
     })

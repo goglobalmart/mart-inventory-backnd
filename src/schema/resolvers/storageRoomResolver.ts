@@ -5,7 +5,7 @@ const storageRoomResolver = {
     Query: {
         getStorageRoom: async (_root: undefined, { keyword }: { keyword: string }) => {
             try {
-                const getStorageRoom = await StorageRoom.find({ name: { $regex: keyword } }).exec();
+                const getStorageRoom = await StorageRoom.find({ name: { $regex: keyword, $options: 'i' } }).exec();
                 return getStorageRoom
             } catch (error) {
                 return {

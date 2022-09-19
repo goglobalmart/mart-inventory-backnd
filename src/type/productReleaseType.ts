@@ -9,7 +9,8 @@ export interface productReleaseType {
     delivery: Boolean,
     status: Boolean,
     numbering: string,
-    delivery_Date: Date,
+    delivery_At: Date,
+    time: string,
     order_Date: Date,
     remark: string,
     items: [

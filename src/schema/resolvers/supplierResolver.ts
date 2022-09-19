@@ -4,15 +4,15 @@ import Supplier from '../../model/Supplier';
 const supplier = {
     Query: {
         getSuppliers: async (_root: undefined, { keyword }: { keyword: string }) => {
-            try { 
-                const suppliers = await Supplier.find({ name: { $regex: keyword } }).sort({ created_At: -1 }).exec();
+            try {
+                const suppliers = await Supplier.find({ name: { $regex: keyword, $options: 'i' } }).sort({ created_At: -1 }).exec();
                 if (suppliers)
                     return {
                         message: "Get Spplier Success!",
                         status: true,
                         data: suppliers
                     }
-                    return suppliers
+                return suppliers
             } catch (error) {
                 return {
                     message: error,
@@ -20,7 +20,7 @@ const supplier = {
                     data: null
                 }
             }
-        } 
+        }
     },
     Mutation: {
         createdSupplier: async (_root: undefined, { input }: { input: supplierType }, { req }: { req: any }) => {
@@ -43,18 +43,18 @@ const supplier = {
                 }
             }
         },
-        updateSupplier: async (_root:undefined,{supplerId,input}:{supplerId:supplierType,input:supplierType}, { req }: { req: any })=>{
+        updateSupplier: async (_root: undefined, { supplerId, input }: { supplerId: supplierType, input: supplierType }, { req }: { req: any }) => {
             try {
-                 const isUpdate = await Supplier.findByIdAndUpdate(supplerId,input)
-                 if(!isUpdate){
-                    return{
-                        message:" Update Supplier failse ",
-                        status:false
+                const isUpdate = await Supplier.findByIdAndUpdate(supplerId, input)
+                if (!isUpdate) {
+                    return {
+                        message: " Update Supplier failse ",
+                        status: false
                     }
-                 }
-                 return{
-                    message:"Supplier Updated",
-                    status:true
+                }
+                return {
+                    message: "Supplier Updated",
+                    status: true
                 }
             } catch (error) {
                 return {
@@ -63,18 +63,18 @@ const supplier = {
                 }
             }
         },
-        deleteSupplier: async (_root:undefined,{supplerId }:{supplerId:supplierType }, { req }: { req: any })=>{
+        deleteSupplier: async (_root: undefined, { supplerId }: { supplerId: supplierType }, { req }: { req: any }) => {
             try {
-                 const isDelete = await Supplier.findByIdAndDelete(supplerId)
-                 if(!isDelete){
-                    return{
-                        message:" Delete Supplier failse ",
-                        status:false
+                const isDelete = await Supplier.findByIdAndDelete(supplerId)
+                if (!isDelete) {
+                    return {
+                        message: " Delete Supplier failse ",
+                        status: false
                     }
-                 }
-                 return{
-                    message:"Supplier Delete",
-                    status:true
+                }
+                return {
+                    message: "Supplier Delete",
+                    status: true
                 }
             } catch (error) {
                 return {

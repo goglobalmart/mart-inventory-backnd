@@ -2,8 +2,10 @@ import ProductRelease from '../../model/ProductRelease';
 import { productReleaseType } from '../../type/productReleaseType';
 import { ProductFifoCheck } from '../../util/fn';
 import authCheck from '../../helpers/auth';
-import { numberingGenerator } from '../../util/fn';
+import { numberingGenerator, CheckStock } from '../../util/fn';
 import ProductsInStock from '../../model/ProductsInStock';
+import mongoose from 'mongoose';
+import moment from 'moment-timezone';
 
 const releaseProductLabels = {
     docs: "data",
@@ -19,7 +21,7 @@ const releaseProductLabels = {
 
 const releaseCard = {
     Query: {
-        getReleaseProductPagination: async (_root: undefined, { page, limit, keyword }: { page: number, limit: number, keyword: string }) => {
+        getReleaseProductPagination: async (_root: undefined, { page, limit, keyword, customer_Id, delivery_Id, delivery_At }: { page: number, limit: number, keyword: string, customer_Id: string, delivery_Id: string, delivery_At: string }) => {
             try {
                 const options = {
                     page: page || 1,
@@ -29,14 +31,19 @@ const releaseCard = {
                         numbering: -1,
                     },
                     populate: "items.storage_Room_Id release_By customer_Id delivery_By items.product_Id",
-
                 }
-
+                // console.log(delivery_At);
+                // console.log(customer_Id);
+                let queryCustomerId = customer_Id === "" ? {} : { customer_Id: new mongoose.Types.ObjectId(customer_Id) };
+                let queryDeliveryId = delivery_Id === "" ? {} : { delivery_By: new mongoose.Types.ObjectId(delivery_Id) }
+                let queryDeliveryDate = delivery_At === "" ? {} : { delivery_At: new Date(delivery_At) };
+                // console.log(queryDeliveryDate);
                 const query = {
                     $and: [
                         { numbering: { $regex: keyword, $options: "i" } },
-                        // { priority: { $regex: priority, $options: "i" } },
-                        // { approve_status: { $regex: approve_status, $options: "i" } },
+                        queryCustomerId,
+                        queryDeliveryId,
+                        queryDeliveryDate
                     ],
                 }
                 const productRelease = await ProductRelease.paginate(query, options);
@@ -50,18 +57,30 @@ const releaseCard = {
     Mutation: {
         createReleaseCard: async (_root: undefined, { input }: { input: productReleaseType }) => {
             try {
-                // console.log(input)
+                let today = new Date(input.delivery_At);
+                let year = today.getFullYear();
+                let month = today.getMonth() + 1;
+                let dt = today.getDate();
+                let newDay: string = dt < 10 ? '0' + String(dt) : String(dt);
+                let newMonth: string = month < 10 ? '0' + String(month) : String(month);
+                let delivery_At = year + '-' + newMonth + '-' + newDay
+
+                const time = moment(input.delivery_At).tz('Asia/Phnom_Penh').format("HH:mm A");
                 const getReleaseLength = await ProductRelease.find().exec();
                 const numbering = await numberingGenerator(getReleaseLength?.length + 1);
-
-                const releasProdut = await new ProductRelease(
+                // console.log(new Date(input.order_Date));
+                const releasProdut = new ProductRelease(
                     {
                         ...input,
                         numbering,
-                        // release_By:
+                        time,
+                        delivery_At,
+                        order_Date: new Date(input.order_Date)
                     }
-                ).save();
-                releasProdut.populate('customer_Id release_By delivery_By items.product_Id');
+                )
+                await releasProdut.save();
+                await releasProdut.populate('customer_Id release_By delivery_By items.product_Id')
+
                 if (releasProdut) {
                     return {
                         message: "Release Producte Createed!",
@@ -86,8 +105,15 @@ const releaseCard = {
         delivered: async (_root: undefined, { release_Card_Id, input }: { release_Card_Id: string, input: productReleaseType }) => {
 
             try {
-                const fifoCheck = await new ProductFifoCheck();
-                const checkProductInstock = await fifoCheck.stockNotEnough(input.items);
+                let today = new Date();
+                let year = today.getFullYear();
+                let month = today.getMonth() + 1;
+                let dt = today.getDate();
+                let newDay: string = dt < 10 ? '0' + String(dt) : String(dt);
+                let newMonth: string = month < 10 ? '0' + String(month) : String(month);
+
+                const checkMessage = await new CheckStock();
+                const checkProductInstock = await checkMessage.stockNotEnough(input.items);
                 if (checkProductInstock.status)
                     return {
                         message: checkProductInstock?.message,
@@ -95,16 +121,24 @@ const releaseCard = {
                         data: null
                     }
 
-                const checkfifo = await fifoCheck.getData(input.items, release_Card_Id);
-                if (checkfifo) {
-                    await ProductRelease.findByIdAndUpdate(release_Card_Id, {
+                const getFifoCheck = input.items.map(item => {
+                    const fifo = new ProductFifoCheck(item.qty, item.product_Id.toString(), item.storage_Room_Id.toString(), release_Card_Id.toString());
+                    const res = fifo.calculate();
+                    return res
+                })
+
+                if (getFifoCheck) {
+                    let releas = await ProductRelease.findByIdAndUpdate(release_Card_Id, {
+                        ...input,
                         delivery: true,
-                        // delivery_Date: new Date()
-                    }).exec();
+                        delivery_At: year + '-' + newMonth + '-' + newDay,
+                        time: moment().tz('Asia/Phnom_Penh').format("HH:mm A")
+                    }).populate('customer_Id release_By delivery_By items.product_Id').exec();
+
                     return {
                         message: "delivered",
                         status: true,
-                        data: null
+                        data: releas
                     }
                 }
 
@@ -115,7 +149,23 @@ const releaseCard = {
         },
         updateReleaseCard: async (_root: undefined, { input }: { input: productReleaseType }) => {
             try {
-                const updateReleaseCard = await ProductRelease.findByIdAndUpdate(input.release_Card_Id, input).populate('customer_Id release_By delivery_By items.product_Id').exec();
+                let today = new Date(input.delivery_At);
+                let year = today.getFullYear();
+                let month = today.getMonth() + 1;
+                let dt = today.getDate();
+                let newDay: string = dt < 10 ? '0' + String(dt) : String(dt);
+                let newMonth: string = month < 10 ? '0' + String(month) : String(month);
+                let delivery_At = year + '-' + newMonth + '-' + newDay
+                const time = moment(input.delivery_At).tz('Asia/Phnom_Penh').format("HH:mm");
+                // console.log("input.release_Card_Id", input.release_Card_Id);
+                // console.log("time", time);
+                const updateReleaseCard = await ProductRelease.findByIdAndUpdate(input.release_Card_Id, {
+                    ...input,
+                    time,
+                    delivery_At,
+                    order_Date: new Date(input.order_Date)
+                }).populate('customer_Id release_By delivery_By items.product_Id').exec();
+                // console.log(input);
                 if (updateReleaseCard) {
                     return {
                         message: "Update Success!",
@@ -140,12 +190,17 @@ const releaseCard = {
         voidingReleaseCard: async (_root: undefined, { release_Card_Id }: { release_Card_Id: string }) => {
             try {
                 const findReleasCard = await ProductRelease.findById(release_Card_Id).exec();
+                // console.log(findReleasCard)
                 findReleasCard?.stock_Record.forEach(async (element: any) => {
-                    const getStockout = await ProductsInStock.findById(element.instock_Id).exec();
+                    const getStockout: any = await ProductsInStock.findById(element.instock_Id).exec();
+                    // const getSotkc = validateToken(getStockout.stock_Out ?? 0)
+                    // console.log("ProductsInStock.stock_Out", getStockout.stock_Out - element?.qty)
                     await ProductsInStock.findByIdAndUpdate(
                         element.instock_Id,
                         {
-                            qty: getStockout?.qty + element?.qty
+                            qty: getStockout?.qty + element?.qty,
+                            stock_Status: "instock",
+                            stock_Out: getStockout.stock_Out - element?.qty
                         }
                     ).exec();
                 });

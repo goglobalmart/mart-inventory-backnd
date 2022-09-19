@@ -8,13 +8,12 @@ const productRelease = gql`
         status: Boolean
         release_By: User
         delivery_By: User
-        storage_Room_Id: StorageRoom
         numbering: String
-        delivery_Date: DataTime 
-        order_Date: DataTime 
+        delivery_At: DataTime 
+        time: String
         remark: String
         items: [Items]
-        created_At: DataTime 
+        order_Date: DataTime 
     }
     type releaseMesage {
         message: String
@@ -30,7 +29,8 @@ const productRelease = gql`
     input createReleaseCardInput {
         customer_Id: String
         delivery_By: String
-        delivery_Date: String 
+        release_By: String
+        delivery_At: DataTime
         order_Date: String
         remark: String
         items: [ releasItemsInput!]
@@ -39,7 +39,8 @@ const productRelease = gql`
         release_Card_Id: String
         customer_Id: String
         delivery_By: String
-        delivery_Date: String 
+        release_By: String
+        delivery_At: DataTime
         order_Date: String
         remark: String
         items: [ releasItemsInput!]
@@ -55,7 +56,7 @@ const productRelease = gql`
     }
     # getReleaseProductPagination
     type Query {
-        getReleaseProductPagination(page: Int!, limit: Int!,keyword: String! ): getReleaseProductPaginationMessage!
+        getReleaseProductPagination(page: Int!, limit: Int!,keyword: String!, customer_Id: String!, delivery_Id: String!, delivery_At: String!  ): getReleaseProductPaginationMessage!
     }
     type Mutation {
         createReleaseCard( input: createReleaseCardInput! ): releaseMesage!
