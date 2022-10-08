@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 
 export interface productReleaseType {
     _id: Types.ObjectId,
-    customer_Id: Types.ObjectId,
+    shop_Id: Types.ObjectId,
     release_By: Types.ObjectId,
     delivery_By: Types.ObjectId,
     release_Card_Id: String,

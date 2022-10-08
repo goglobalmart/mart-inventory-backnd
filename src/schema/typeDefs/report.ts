@@ -21,7 +21,7 @@ const report = gql`
         unit_Price: Float
         amount: Float
         vendor: String
-        customer: String
+        shop: String
    }
     type getReportMessage {
         message: String
@@ -29,7 +29,7 @@ const report = gql`
         data: [StockOnHand]
     }
     type TotalUserMessage {
-        customer: Float
+        shop: Float
         supplier: Float
     }
     type Query {

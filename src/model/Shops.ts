@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
-import customerType from '../type/customerType';
+import shopType from '../type/shopType';
 
-const customerSchemar = new Schema<customerType>({
+const ShopSchemar = new Schema<shopType>({
     name: String,
     email: String,
     phone: String,
@@ -9,5 +9,5 @@ const customerSchemar = new Schema<customerType>({
     remark: String,
     created_At: { type: Date, default: new Date() }
 })
-const Customer = model<customerType>('Customer', customerSchemar);
-export default Customer;
+const Shop = model<shopType>('Shops', ShopSchemar);
+export default Shop;

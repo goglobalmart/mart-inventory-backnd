@@ -1,19 +1,19 @@
 import { gql } from 'apollo-server-express'
-const customer = gql` 
+const shop = gql` 
         scalar DataTime 
         type Query{
-            getAllCustomer(keyword: String!): [Customer!]
+            getAllShops(keyword: String!): [Shop!]
         }
         type Mutation{
-            createCustomer( input: CustomerInput!): customerMessage!
-            updateCustomer( customerId: ID,input: CustomerInput): customerMessage!
-            deleteCustomer( customerId: ID): customerMessage!
+            createShop( input: ShopInput!): shopMessage!
+            updateShop( shopId: ID,input: ShopInput): shopMessage!
+            deleteShop( shopId: ID): shopMessage!
         }
-        type customerMessage {
+        type shopMessage {
             status: Boolean
             message: String
         }
-        type Customer {
+        type Shop {
             _id:ID
             name: String 
             email: String
@@ -22,7 +22,7 @@ const customer = gql`
             remark: String
             created_At: DataTime
         }
-        input CustomerInput{
+        input ShopInput{
             name: String 
             email: String
             phone: String 
@@ -30,4 +30,4 @@ const customer = gql`
             remark: String
         }
     `;
-export default customer
+export default shop

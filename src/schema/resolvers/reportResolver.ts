@@ -2,7 +2,7 @@ import ProductsInStock from '../../model/ProductsInStock';
 import Product from '../../model/Product';
 import Purchase from '../../model/Purchase';
 import ProductRelease from '../../model/ProductRelease';
-import Customer from '../../model/Customer';
+import Shops from '../../model/Shops';
 import Supplier from '../../model/Supplier';
 
 const reportResolver = {
@@ -68,7 +68,7 @@ const reportResolver = {
                 // console.log("stock out", to, from)
                 let queryFrom = from.trim().length === 0 ? {} : { delivery_At: { $gte: new Date(from) } }
                 let queryTo = to.trim().length === 0 ? {} : { delivery_At: { $lte: new Date(to) } };
-              
+
                 const getStockOut = await ProductRelease.aggregate([
                     { $match: { status: false } },
                     { $match: { delivery: true } },
@@ -90,14 +90,14 @@ const reportResolver = {
                     },
                     {
                         $lookup: {
-                            from: "customers",
-                            localField: "customer_Id",
+                            from: "shops",
+                            localField: "shop_Id",
                             foreignField: "_id",
-                            as: "customer"
+                            as: "shop"
                         }
                     },
                     {
-                        $unwind: { path: "$customer", preserveNullAndEmptyArrays: true }
+                        $unwind: { path: "$shop", preserveNullAndEmptyArrays: true }
                     }
                 ]);
                 const data = getStockOut.map(pur => {
@@ -109,7 +109,7 @@ const reportResolver = {
                         amount: pur.items.qty * pur.items.unit_Price,
                         qty: pur.items.qty,
                         unit_Price: pur.items.unit_Price,
-                        customer: pur.customer.name
+                        shop: pur.shop.name
                     }
                     return obj
                 })
@@ -213,10 +213,10 @@ const reportResolver = {
             return TotalItemsInPuchas
         },
         getTotalUser: async () => {
-            const getCustomers = await Customer.find().exec();
+            const getShops = await Shops.find().exec();
             const getSupplier = await Supplier.find().exec();
             return {
-                customer: getCustomers.length,
+                shop: getShops.length,
                 supplier: getSupplier.length
             }
         },

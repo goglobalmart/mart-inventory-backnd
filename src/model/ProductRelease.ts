@@ -3,7 +3,7 @@ import { productReleaseType } from '../type/productReleaseType';
 import paginate from 'mongoose-paginate-v2';
 
 const productReleaseSchema = new Schema<productReleaseType>({
-    customer_Id: { type: Schema.Types.ObjectId, ref: 'Customer' },
+    shop_Id: { type: Schema.Types.ObjectId, ref: 'Shops' },
     release_By: { type: Schema.Types.ObjectId, ref: 'User' },
     delivery_By: { type: Schema.Types.ObjectId, ref: 'User' },
     numbering: String,

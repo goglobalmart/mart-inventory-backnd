@@ -1,4 +1,4 @@
-interface customerType {
+interface shopType {
   name: String,
   email: string,
   phone: string,
@@ -6,4 +6,4 @@ interface customerType {
   remark: string
   created_At: Date,
 }
-export default customerType
+export default shopType

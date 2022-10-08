@@ -1,12 +1,12 @@
-import customerType from '../../type/customerType';
-import Customer from '../../model/Customer';
+import shopType from '../../type/shopType';
+import Shop from '../../model/Shops';
 import authCheck from '../../helpers/auth'
-const customer = {
+const Shops = {
     Query: {
-        getAllCustomer: async (_root: undefined, { keyword }: { keyword: string }, { req }: { req: any }) => {
+        getAllShops: async (_root: undefined, { keyword }: { keyword: string }, { req }: { req: any }) => {
             await authCheck(req.headers.authorization);
             try {
-                const get = await Customer.find({ name: { $regex: keyword, $options: "i" } }).exec();
+                const get = await Shop.find({ name: { $regex: keyword, $options: "i" } }).exec();
                 return get
             } catch (error) {
                 return {
@@ -18,9 +18,9 @@ const customer = {
         }
     },
     Mutation: {
-        createCustomer: async (_root: undefined, { input }: { input: customerType }) => {
+        createShop: async (_root: undefined, { input }: { input: shopType }) => {
             try {
-                const isCreate = await new Customer(input).save()
+                const isCreate = await new Shop(input).save()
                 if (!isCreate) {
                     return {
                         message: "create failse",
@@ -39,9 +39,9 @@ const customer = {
                 }
             }
         },
-        updateCustomer: async (_root: undefined, { customerId, input }: { customerId: customerType, input: customerType }) => {
+        updateShop: async (_root: undefined, { shopId, input }: { shopId: shopType, input: shopType }) => {
             try {
-                const isUpdate = await Customer.findByIdAndUpdate(customerId, input)
+                const isUpdate = await Shop.findByIdAndUpdate(shopId, input)
                 if (!isUpdate) {
                     return {
                         message: "Update failse",
@@ -60,9 +60,9 @@ const customer = {
                 }
             }
         },
-        deleteCustomer: async (_root: undefined, { customerId }: { customerId: customerType }) => {
+        deleteShop: async (_root: undefined, { shopId }: { shopId: shopType }) => {
             try {
-                const isDelete = await Customer.findByIdAndDelete(customerId)
+                const isDelete = await Shop.findByIdAndDelete(shopId)
                 if (!isDelete) {
                     return {
                         message: "delete failse",
@@ -84,4 +84,4 @@ const customer = {
     }
 }
 
-export default customer
+export default Shops

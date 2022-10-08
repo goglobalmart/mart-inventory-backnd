@@ -21,7 +21,7 @@ const releaseProductLabels = {
 
 const releaseCard = {
     Query: {
-        getReleaseProductPagination: async (_root: undefined, { page, limit, keyword, customer_Id, delivery_Id, delivery_At }: { page: number, limit: number, keyword: string, customer_Id: string, delivery_Id: string, delivery_At: string }) => {
+        getReleaseProductPagination: async (_root: undefined, { page, limit, keyword, shop_Id, delivery_Id, delivery_At }: { page: number, limit: number, keyword: string, shop_Id: string, delivery_Id: string, delivery_At: string }) => {
             try {
                 const options = {
                     page: page || 1,
@@ -30,18 +30,16 @@ const releaseCard = {
                     sort: {
                         numbering: -1,
                     },
-                    populate: "items.storage_Room_Id release_By customer_Id delivery_By items.product_Id",
+                    populate: "items.storage_Room_Id release_By shop_Id delivery_By items.product_Id",
                 }
-                // console.log(delivery_At);
-                // console.log(customer_Id);
-                let queryCustomerId = customer_Id === "" ? {} : { customer_Id: new mongoose.Types.ObjectId(customer_Id) };
+                let queryShopId = shop_Id === "" ? {} : { shop_Id: new mongoose.Types.ObjectId(shop_Id) };
                 let queryDeliveryId = delivery_Id === "" ? {} : { delivery_By: new mongoose.Types.ObjectId(delivery_Id) }
                 let queryDeliveryDate = delivery_At === "" ? {} : { delivery_At: new Date(delivery_At) };
                 // console.log(queryDeliveryDate);
                 const query = {
                     $and: [
                         { numbering: { $regex: keyword, $options: "i" } },
-                        queryCustomerId,
+                        queryShopId,
                         queryDeliveryId,
                         queryDeliveryDate
                     ],
@@ -79,7 +77,7 @@ const releaseCard = {
                     }
                 )
                 await releasProdut.save();
-                await releasProdut.populate('customer_Id release_By delivery_By items.product_Id')
+                await releasProdut.populate('shop_Id release_By delivery_By items.product_Id')
 
                 if (releasProdut) {
                     return {
@@ -133,7 +131,7 @@ const releaseCard = {
                         delivery: true,
                         delivery_At: year + '-' + newMonth + '-' + newDay,
                         time: moment().tz('Asia/Phnom_Penh').format("HH:mm A")
-                    }).populate('customer_Id release_By delivery_By items.product_Id').exec();
+                    }).populate('shop_Id release_By delivery_By items.product_Id').exec();
 
                     return {
                         message: "delivered",
@@ -164,7 +162,7 @@ const releaseCard = {
                     time,
                     delivery_At,
                     order_Date: new Date(input.order_Date)
-                }).populate('customer_Id release_By delivery_By items.product_Id').exec();
+                }).populate('shop_Id release_By delivery_By items.product_Id').exec();
                 // console.log(input);
                 if (updateReleaseCard) {
                     return {

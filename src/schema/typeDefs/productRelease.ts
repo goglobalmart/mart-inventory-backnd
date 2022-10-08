@@ -3,7 +3,7 @@ import { gql } from 'apollo-server-express';
 const productRelease = gql`
     type RroductRelease {
         _id: ID
-        customer_Id: Customer
+        shop_Id: Shop
         delivery: Boolean
         status: Boolean
         release_By: User
@@ -27,7 +27,7 @@ const productRelease = gql`
     }
     # Input Type 
     input createReleaseCardInput {
-        customer_Id: String
+        shop_Id: String
         delivery_By: String
         release_By: String
         delivery_At: DataTime
@@ -37,7 +37,7 @@ const productRelease = gql`
     }
     input updateReleaseCardInput {
         release_Card_Id: String
-        customer_Id: String
+        shop_Id: String
         delivery_By: String
         release_By: String
         delivery_At: DataTime
@@ -56,7 +56,7 @@ const productRelease = gql`
     }
     # getReleaseProductPagination
     type Query {
-        getReleaseProductPagination(page: Int!, limit: Int!,keyword: String!, customer_Id: String!, delivery_Id: String!, delivery_At: String!  ): getReleaseProductPaginationMessage!
+        getReleaseProductPagination(page: Int!, limit: Int!,keyword: String!, shop_Id: String!, delivery_Id: String!, delivery_At: String!  ): getReleaseProductPaginationMessage!
     }
     type Mutation {
         createReleaseCard( input: createReleaseCardInput! ): releaseMesage!

@@ -173,6 +173,7 @@ export class ProductFifoCheck {
         this.CardId = cardId;
     }
     public async calculate() {
+        let listCusting: Array<number> = [];
         const allItem = await ProductsInStock.find(
             {
                 stock_Status: "instock",
@@ -180,8 +181,11 @@ export class ProductFifoCheck {
                 storage_Room_Id: new mongoose.Types.ObjectId(this.Storage_Id)
             }
         ).sort({ created_At: 1 }).exec();
+
         allItem.forEach(async (item: any) => {
+
             if (this.QtyNeed === item.qty) {
+                // listCusting.push(item.qty * item.qty)
                 console.log(`instock: ${item.qty}=>Update: qty=${0},stockSatuse="stockOut", stockOut=${item.qty} | this.QtyNeed=${0}`)
                 this.QtyNeed = 0
                 await ProductsInStock.findByIdAndUpdate(item._id, {
