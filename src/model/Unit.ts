@@ -3,7 +3,7 @@ import unitType from '../type/unitType'
 
 const unit = new  Schema<unitType>({
     name: String,
-    created_At: { type: Date, default: new Date() }
+    created_At: { type: Date, default: Date.now }
 })
 const Unit = model<unitType>('Unit',unit);
 export default Unit

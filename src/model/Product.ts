@@ -12,7 +12,7 @@ const productSchema = new Schema<productType>({
     feature: String,
     unit: String,
     bar_Code: String,
-    created_At: { type: Date, default: new Date() }
+    created_At: { type: Date, default: Date.now }
 })
 
 productSchema.plugin(paginate);

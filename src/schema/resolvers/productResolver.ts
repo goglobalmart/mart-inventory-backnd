@@ -1,6 +1,8 @@
 import { productType } from '../../type/productType';
 import Product from '../../model/Product';
 import ProductsInStock from '../../model/ProductsInStock';
+import ProductRelease from '../../model/ProductRelease';
+import Purchase from '../../model/Purchase';
 
 const productLabels = {
     docs: "data",
@@ -64,7 +66,6 @@ const productResolver = {
 
                 const getProductStock = await Promise.all(
                     getProduct.map(async (pro: any) => {
-                        // console.log(pro)
                         const getStock = await ProductsInStock.find({
                             product_Id: pro._id,
                             stock_Status: "instock",
@@ -78,7 +79,6 @@ const productResolver = {
                             (previousValue: any, currentValue: any) => previousValue + currentValue,
                             initialValue
                         );
-                        // console.log(TotalInsockItemQty)
                         return {
                             name: pro.name,
                             qty: TotalInsockItemQty,
@@ -88,7 +88,6 @@ const productResolver = {
                     })
                 )
 
-                // const newData: any = getProductStock.sort((a: any, b: any) => (a.qty < b.qty) ? -1 : 1);
 
 
             } catch (error) {
@@ -100,7 +99,11 @@ const productResolver = {
     Mutation: {
         createProduct: async (_root: undefined, { input }: { input: productType }, { req }: { req: any }) => {
             try {
-                const product = await new Product(input).save();
+                console.log("input", input);
+                const product = await new Product({
+                    ...input,
+                    // created_At: 
+                }).save();
                 if (product)
                     return {
                         message: "Product Created!",
@@ -148,6 +151,15 @@ const productResolver = {
                         status: false
                     }
                 }
+
+                await ProductRelease.updateOne(
+                    { "items.product_Id": product_Id },
+                    { $pull: { items: { product_Id: product_Id } } }
+                );
+                await Purchase.updateOne(
+                    { "items.product_Id": product_Id },
+                    { $pull: { items: { product_Id: product_Id } } }
+                );
                 return {
                     message: "Delete Product Success",
                     status: true

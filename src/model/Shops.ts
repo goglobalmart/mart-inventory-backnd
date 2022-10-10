@@ -7,7 +7,7 @@ const ShopSchemar = new Schema<shopType>({
     phone: String,
     address: String,
     remark: String,
-    created_At: { type: Date, default: new Date() }
+    created_At: { type: Date, default: Date.now }
 })
 const Shop = model<shopType>('Shops', ShopSchemar);
 export default Shop;

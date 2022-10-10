@@ -9,7 +9,7 @@ const userShema = new Schema<userType>({
     image_src: String ,
     email: String,
     role: String,
-    created_At: { type: Date, default: new Date() }
+    created_At: { type: Date, default: Date.now }
 },
     { _id: false }
 )

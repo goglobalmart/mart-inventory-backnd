@@ -10,7 +10,7 @@ const supplierSchema = new Schema<supplierType>({
     facebook: String,
     image_Src: String,
     image_Name: String,
-    created_At: { type: Date, default: new Date() }
+    created_At: { type: Date, default: Date.now }
 });
 const Supplier = model<supplierType>('Supplier', supplierSchema);
 export default Supplier;

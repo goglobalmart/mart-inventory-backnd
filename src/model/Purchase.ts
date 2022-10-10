@@ -23,7 +23,7 @@ const purchaseSchema = new Schema<purchaseType>({
     }],
     remark: String,
     receive_Date: Date,
-    created_At: { type: Date, default: new Date() }
+    created_At: { type: Date, default: Date.now }
 })
 
 purchaseSchema.plugin(paginate);

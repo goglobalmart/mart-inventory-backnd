@@ -4,7 +4,7 @@ const storageRoom = new Schema<storageRoomType>({
     name: String,
     place: String,
     remark: String,
-    created_At: { type: Date, default: new Date() }
+    created_At: { type: Date, default: Date.now }
 })
 const StorageRoom = model<storageRoomType>('StorageRoom', storageRoom )
 export default StorageRoom
