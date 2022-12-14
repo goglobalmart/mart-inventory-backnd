@@ -4,13 +4,15 @@ import Purchase from '../../model/Purchase';
 import ProductRelease from '../../model/ProductRelease';
 import Shops from '../../model/Shops';
 import Supplier from '../../model/Supplier';
+import mongoose from 'mongoose'
 
 const reportResolver = {
     Query: {
-        getStockInReport: async (_root: undefined, { to, from }: { to: string, from: string }) => {
+        getStockInReport: async (_root: undefined, { product_Id, to, from }: { product_Id: string, to: string, from: string }) => {
             try {
                 let queryFrom = from.trim().length === 0 ? {} : { receive_Date: { $gte: new Date(from) } }
                 let queryTo = to.trim().length === 0 ? {} : { receive_Date: { $lte: new Date(to) } };
+                let queryProduct = product_Id.length === 0 ? {} : { "items.product_Id": new mongoose.Types.ObjectId(product_Id) }
                 // console.log("stocking", to, from)
                 const getPurchas = await Purchase.aggregate([
                     { $match: { status: false } },
@@ -19,6 +21,9 @@ const reportResolver = {
                     { $match: queryTo },
                     {
                         $unwind: { path: "$items" }
+                    },
+                    {
+                        $match: queryProduct
                     },
                     {
                         $lookup: {
@@ -44,9 +49,10 @@ const reportResolver = {
                     },
                     { $sort: { receive_Date: 1 } }
                 ]);
+                // console.log(getPurchas);
                 const data: any = getPurchas.map(pur => {
                     let obj = {
-                        _id: pur._id,
+                        _id: pur.product._id,
                         date: pur.receive_Date,
                         item: pur.product.name,
                         unit: pur.product.unit,
@@ -63,11 +69,11 @@ const reportResolver = {
                 return error
             }
         },
-        getStockOutReport: async (_root: undefined, { to, from }: { to: string, from: string }) => {
+        getStockOutReport: async (_root: undefined, { product_Id, to, from }: { product_Id: string, to: string, from: string }) => {
             try {
-                // console.log("stock out", to, from)
                 let queryFrom = from.trim().length === 0 ? {} : { delivery_At: { $gte: new Date(from) } }
                 let queryTo = to.trim().length === 0 ? {} : { delivery_At: { $lte: new Date(to) } };
+                let queryProduct = product_Id.length === 0 ? {} : { "items.product_Id": new mongoose.Types.ObjectId(product_Id) }
 
                 const getStockOut = await ProductRelease.aggregate([
                     { $match: { status: false } },
@@ -76,6 +82,9 @@ const reportResolver = {
                     { $match: queryTo },
                     {
                         $unwind: { path: "$items" }
+                    },
+                    {
+                        $match: queryProduct
                     },
                     {
                         $lookup: {
@@ -118,17 +127,22 @@ const reportResolver = {
                 return error
             }
         },
-        getStockOnhandReport: async (_root: undefined, { }: {}) => {
+        getStockOnhandReport: async (_root: undefined, { product_Id }: { product_Id: string }) => {
             try {
-                const getAllProduct = await Product.find().exec();
+                let queryProduct = product_Id.length === 0 ? {} : {
+                    _id: new mongoose.Types.ObjectId(product_Id)
+                }
+                const getAllProduct = await Product.find(queryProduct).exec();
                 const getProductsInStockDetail: any = await Promise.all(getAllProduct.map(async (element: any) => {
+
                     const getproductInStock = await ProductsInStock.find(
                         {
                             product_Id: element._id,
                             status: false,
                             stock_Status: "instock"
                         }
-                    ).exec()
+                    ).exec();
+
                     const getQtyTotal: any = getproductInStock.map((pro: { qty: any; }) => {
                         return pro.qty
                     })
