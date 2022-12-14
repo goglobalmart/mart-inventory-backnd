@@ -1,7 +1,6 @@
 import ProductRelease from '../../model/ProductRelease';
 import { productReleaseType } from '../../type/productReleaseType';
 import { ProductFifoCheck } from '../../util/fn';
-import authCheck from '../../helpers/auth';
 import { numberingGenerator, CheckStock } from '../../util/fn';
 import ProductsInStock from '../../model/ProductsInStock';
 import mongoose from 'mongoose';

@@ -173,7 +173,9 @@ export class ProductFifoCheck {
         this.CardId = cardId;
     }
     public async calculate() {
+
         let listCusting: Array<number> = [];
+        
         const allItem = await ProductsInStock.find(
             {
                 stock_Status: "instock",
