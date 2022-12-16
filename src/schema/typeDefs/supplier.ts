@@ -34,8 +34,30 @@ input createSupplierInput {
   image_Src: String
   image_Name: String
 }
+type SupplierPaginator {
+  data: [Supplier]
+  paginator: Paginator
+}
+type Paginator {
+  slNo: Int
+  prev: Int
+  next: Int
+  perPage: Int
+  totalPosts: Int
+  totalPages: Int
+  currentPage: Int
+  hasPrevPage: Boolean
+  hasNextPage: Boolean
+  totalDocs: Int
+}
 type Query {
   getSuppliers( keyword: String! ):  getSupplierMessage! 
+  getSuppliersWithPagination(
+    page: Int
+    limit: Int
+    keyword: String
+    pagination: Boolean
+    ): SupplierPaginator
 } 
 type Mutation {
   createdSupplier(input: createSupplierInput!): supplierMessage!

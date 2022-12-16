@@ -1,6 +1,16 @@
 import { supplierType } from '../../type/supplierType';
 import Supplier from '../../model/Supplier';
-
+const Label = {
+    docs: "data",
+    limit: "perPage",
+    nextPage: "next",
+    prevPage: "prev",
+    meta: "paginator",
+    page: "currentPage",
+    pagingCounter: "slNo",
+    totalDocs: "totalDocs",
+    totalPages: "totalPages",
+  };
 const supplier = {
     Query: {
         getSuppliers: async (_root: undefined, { keyword }: { keyword: string }) => {
@@ -20,7 +30,38 @@ const supplier = {
                     data: null
                 }
             }
-        }
+        },
+        getSuppliersWithPagination: async (
+            _root: undefined,
+            {
+              page,
+              limit,
+              keyword,
+              pagination,
+            }: { page: number; limit: number; keyword: string; pagination: boolean }
+          ) => {
+            try {
+              const options = {
+                page: page || 1,
+                limit: limit || 10,
+                pagination: pagination,
+                customLabels: Label,
+                sort: { created_at: -1 },
+              };
+              const query = {
+                $or: [ 
+                    { name: { $regex: keyword, $options: "i" } },
+                ]
+              };
+              const isGet = await Supplier.paginate(query, options);
+              return isGet;
+            } catch (error) {
+              return {
+                isSuccess: false,
+                message: error,
+              };
+            }
+          },
     },
     Mutation: {
         createdSupplier: async (_root: undefined, { input }: { input: supplierType }, { req }: { req: any }) => {
