@@ -73,8 +73,7 @@ const reportResolver = {
             try {
                 let queryFrom = from.trim().length === 0 ? {} : { delivery_At: { $gte: new Date(from) } }
                 let queryTo = to.trim().length === 0 ? {} : { delivery_At: { $lte: new Date(to) } };
-                let queryProduct = product_Id.length === 0 ? {} : { "items.product_Id": new mongoose.Types.ObjectId(product_Id) }
-
+                let queryProduct = product_Id.length === 0 ? {} : { "items.product_Id": new mongoose.Types.ObjectId(product_Id) } 
                 const getStockOut = await ProductRelease.aggregate([
                     { $match: { status: false } },
                     { $match: { delivery: true } },
@@ -109,7 +108,7 @@ const reportResolver = {
                         $unwind: { path: "$shop", preserveNullAndEmptyArrays: true }
                     }
                 ]);
-                const data = getStockOut.map(pur => {
+                const data = getStockOut.map(pur => { 
                     let obj = {
                         _id: pur.product._id,
                         date: pur.delivery_At,
