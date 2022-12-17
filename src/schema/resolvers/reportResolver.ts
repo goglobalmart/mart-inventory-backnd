@@ -63,8 +63,16 @@ const reportResolver = {
                     }
                     return obj
                 })
-
-                return data
+                const Total_Amount = data.map((e:any)=>{ return  e.amount}) .reduce((accumulator:any , currentValue:any) => accumulator + currentValue);
+                const Total_qty = data.map((e:any)=>{ return  e.qty}) .reduce((accumulator:any, currentValue:any) => accumulator + currentValue);
+                const Total_unit_Price = data.map((e:any)=>{ return  e.unit_Price}) .reduce((accumulator:any, currentValue:any) => accumulator + currentValue);
+   
+                  return { 
+                      data:data,
+                      total_unit_price: Total_unit_Price,
+                      total_amount: Total_Amount,
+                      total_qty: Total_qty
+                  } 
             } catch (error) {
                 return error
             }
@@ -108,7 +116,7 @@ const reportResolver = {
                         $unwind: { path: "$shop", preserveNullAndEmptyArrays: true }
                     }
                 ]);
-                const data = getStockOut.map(pur => { 
+                const data = getStockOut.map(pur => {  
                     let obj = {
                         _id: pur.product._id,
                         date: pur.delivery_At,
@@ -120,8 +128,18 @@ const reportResolver = {
                         shop: pur.shop.name
                     }
                     return obj
-                })
-                return data
+                })  
+              const Total_Amount = data.map(e=>{ return  e.amount}) .reduce((accumulator, currentValue) => accumulator + currentValue);
+              const Total_qty = data.map(e=>{ return  e.qty}) .reduce((accumulator, currentValue) => accumulator + currentValue);
+              const Total_unit_Price = data.map(e=>{ return  e.unit_Price}) .reduce((accumulator, currentValue) => accumulator + currentValue);
+ 
+                return { 
+                    data:data,
+                    total_unit_price: Total_unit_Price,
+                    total_amount: Total_Amount,
+                    total_qty: Total_qty
+                }
+                     
             } catch (error) {
                 return error
             }
@@ -165,7 +183,7 @@ const reportResolver = {
                             stock_Detail: getproductInStock,
                             total_Qty: TotalInsockItemQty,
                             total_Amount: TotalInsockItemUnitPrice
-                        }
+                        } 
                 }))
                 const getFinal = getProductsInStockDetail.filter((product: any) => product != undefined);
                 return {

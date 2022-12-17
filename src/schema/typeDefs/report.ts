@@ -23,6 +23,12 @@ const report = gql`
         vendor: String
         shop: String
    }
+   type GetStockReport{
+    data: [getStockReport!]!
+    total_unit_price: Float
+    total_amount: Float
+    total_qty: Float
+   }
     type getReportMessage {
         message: String
         status: Boolean
@@ -34,8 +40,8 @@ const report = gql`
     }
     type Query {
         getStockOnhandReport(product_Id: String!): getReportMessage!
-        getStockInReport(product_Id: String!,from: String!, to: String!): [getStockReport!]!
-        getStockOutReport(product_Id: String!,from: String!, to: String!): [getStockReport!]!
+        getStockInReport(product_Id: String!,from: String!, to: String!): GetStockReport
+        getStockOutReport(product_Id: String!,from: String!, to: String!): GetStockReport
         getQtyInHand: Float!
         getQtyWillReceived: Float!
         getTotalUser: TotalUserMessage!
