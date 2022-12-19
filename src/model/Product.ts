@@ -2,7 +2,7 @@ import mongoose, { model, Schema } from 'mongoose';
 import { productType } from '../type/productType';
 import paginate from 'mongoose-paginate-v2';
 
-const productSchema = new Schema<productType>({
+const productSchema = new Schema<productType>({ 
     name: { type: String, required: true },
     cost: Number,
     category: String,

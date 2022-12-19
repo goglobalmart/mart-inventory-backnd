@@ -178,7 +178,7 @@ const reportResolver = {
                     );
                     if (getproductInStock.length != 0)
                         return {
-                            productName: element.name,
+                            productName: element.name, 
                             unit: element.unit,
                             stock_Detail: getproductInStock,
                             total_Qty: TotalInsockItemQty,
@@ -186,9 +186,13 @@ const reportResolver = {
                         } 
                 }))
                 const getFinal = getProductsInStockDetail.filter((product: any) => product != undefined);
+                
+              const Total_All_Amount = getFinal.map((e: any)=>{ return  e.total_Amount}) .reduce((accumulator:any, currentValue : any) => accumulator + currentValue);
+            //   console.log(Total_All_Amount)
                 return {
                     message: "Get report Success!",
-                    status: true,
+                    status: true, 
+                    total_All_Amount: Total_All_Amount,
                     data: getFinal
                 }
             } catch (error) {

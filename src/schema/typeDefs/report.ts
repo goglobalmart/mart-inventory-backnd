@@ -32,6 +32,7 @@ const report = gql`
     type getReportMessage {
         message: String
         status: Boolean
+        total_All_Amount: Float
         data: [StockOnHand]
     }
     type TotalUserMessage {
