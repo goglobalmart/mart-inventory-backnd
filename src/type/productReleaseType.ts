@@ -18,6 +18,7 @@ export interface productReleaseType {
             product_Id: Types.ObjectId,
             qty: number,
             unit_Price: number,
+            category: string,
             storage_Room_Id: Types.ObjectId,
             storage_Room_name: string,
             key: Date,

@@ -24,6 +24,7 @@ export interface productInstockType {
     storage_Room_Id?: Types.ObjectId,
     purchase_Id: Types.ObjectId,
     expire_At: Date,
+    instock_At: Date,
     created_At: Date
 }
 

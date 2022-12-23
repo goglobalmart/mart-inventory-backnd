@@ -11,6 +11,7 @@ const productsInStockSchema = new Schema<productInstockType>({
     created_At: Date,
     storage_Room_Id: { type: Schema.Types.ObjectId, ref: 'StorageRoom' },
     purchase_Id: { type: Schema.Types.ObjectId, ref: 'Purchase' },
+    instock_At: Date,
     expire_At: Date
 })
 

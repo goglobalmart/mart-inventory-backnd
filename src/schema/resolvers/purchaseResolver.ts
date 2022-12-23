@@ -66,6 +66,7 @@ const purchase = {
     },
     Mutation: {
         createPurchase: async (_root: undefined, { input }: { input: purchaseType }, { req }: { req: any }) => {
+            // console.log(input);
             const currentUser = await authCheck(req.headers.authorization);
             let newArray: {
                 product_Id: Types.ObjectId,
@@ -73,11 +74,20 @@ const purchase = {
                 unit_Price: number,
                 storage_Room_Id: Types.ObjectId
             }[] = [];
+
             try {
                 const getPurchas = await Purchase.find().exec();
                 const numbering = await numberingGenerator(getPurchas?.length + 1);
+                const newItems = await Promise.all(
+                    input.items.map(async (item: any) => {
+                        let getProduct = await Product.findById(item.product_Id);
+                        const obj2 = Object.assign(item, { category: getProduct?.category });
+                        return obj2
+                    })
+                )
                 const purchase = await new Purchase({
                     ...input,
+                    items: newItems,
                     _id: new mongoose.Types.ObjectId(),
                     numbering,
                     purchase_By: new mongoose.Types.ObjectId(currentUser.uid)
@@ -119,8 +129,18 @@ const purchase = {
                     unit_Price: number,
                     storage_Room_Id: Types.ObjectId
                 }[] = [];
-
-                const purchase = await Purchase.findByIdAndUpdate(purchase_Id, input).populate('storage_Room_Id items.product_Id').exec();
+                const newItems = await Promise.all(
+                    input.items.map(async (item: any) => {
+                        let getProduct = await Product.findById(item.product_Id);
+                        const obj2 = Object.assign(item, { category: getProduct?.category });
+                        return obj2
+                    })
+                )
+                const purchase = await Purchase.findByIdAndUpdate(purchase_Id,
+                    {
+                        ...input,
+                        items: newItems,
+                    }).populate('storage_Room_Id items.product_Id').exec();
                 if (purchase) {
 
                     purchase.items.forEach(async item => {
@@ -159,6 +179,8 @@ const purchase = {
             const currentUser = await authCheck(req.headers.authorization);
 
             try {
+
+
                 const purchase = await Purchase.findByIdAndUpdate(
                     purchase_Id,
                     {
@@ -237,8 +259,16 @@ const purchase = {
             let newMonth: string = month < 10 ? '0' + String(month) : String(month)
 
             try {
+                const newItems = await Promise.all(
+                    input.items.map(async (item: any) => {
+                        let getProduct = await Product.findById(item.product_Id);
+                        const obj2 = Object.assign(item, { category: getProduct?.category });
+                        return obj2
+                    })
+                )
                 const getReceivePuchas = await Purchase.findByIdAndUpdate(input._id, {
                     ...input,
+                    items: newItems,
                     approve_status: "instock",
                     receive_By: new mongoose.Types.ObjectId(currentUser.uid),
                     receive_Date: year + '-' + newMonth + '-' + newDay
@@ -253,7 +283,8 @@ const purchase = {
                                 created_At: new Date(),
                                 expire_At: item.expire_At,
                                 unit_Price: item.unit_Price,
-                                qty: item.qty
+                                qty: item.qty,
+                                instock_At: year + '-' + newMonth + '-' + newDay
                             }
                         );
                         await Product.findByIdAndUpdate(

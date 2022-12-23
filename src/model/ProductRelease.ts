@@ -16,6 +16,7 @@ const productReleaseSchema = new Schema<productReleaseType>({
         product_Id: { type: Schema.Types.ObjectId, ref: 'Product' },
         qty: Number,
         unit_Price: Number,
+        category: String,
         storage_Room_Id: { type: Schema.Types.ObjectId, ref: 'StorageRoom' },
         storage_Room_name: String,
         key: Date,

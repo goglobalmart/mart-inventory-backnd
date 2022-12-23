@@ -17,6 +17,7 @@ const purchaseSchema = new Schema<purchaseType>({
     items: [{
         product_Id: { type: Schema.Types.ObjectId, ref: 'Product' },
         qty: Number,
+        category: String,
         unit_Price: Number,
         key: { type: Date },
 

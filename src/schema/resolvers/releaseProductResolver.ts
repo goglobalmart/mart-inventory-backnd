@@ -5,6 +5,7 @@ import { numberingGenerator, CheckStock } from '../../util/fn';
 import ProductsInStock from '../../model/ProductsInStock';
 import mongoose from 'mongoose';
 import moment from 'moment-timezone';
+import Product from '../../model/Product';
 
 const releaseProductLabels = {
     docs: "data",
@@ -65,10 +66,17 @@ const releaseCard = {
                 const time = moment(input.delivery_At).tz('Asia/Phnom_Penh').format("HH:mm A");
                 const getReleaseLength = await ProductRelease.find().exec();
                 const numbering = await numberingGenerator(getReleaseLength?.length + 1);
-                // console.log(new Date(input.order_Date));
+                const newItems = await Promise.all(
+                    input.items.map(async (item: any) => {
+                        let getProduct = await Product.findById(item.product_Id);
+                        const obj2 = Object.assign(item, { category: getProduct?.category });
+                        return obj2
+                    })
+                )
                 const releasProdut = new ProductRelease(
                     {
                         ...input,
+                        items: newItems,
                         numbering,
                         time,
                         delivery_At,
@@ -123,10 +131,17 @@ const releaseCard = {
                     const res = fifo.calculate();
                     return res
                 })
-
+                const newItems = await Promise.all(
+                    input.items.map(async (item: any) => {
+                        let getProduct = await Product.findById(item.product_Id);
+                        const obj2 = Object.assign(item, { category: getProduct?.category });
+                        return obj2
+                    })
+                )
                 if (getFifoCheck) {
                     let releas = await ProductRelease.findByIdAndUpdate(release_Card_Id, {
                         ...input,
+                        items: newItems,
                         delivery: true,
                         delivery_At: year + '-' + newMonth + '-' + newDay,
                         time: moment().tz('Asia/Phnom_Penh').format("HH:mm A")
@@ -154,15 +169,22 @@ const releaseCard = {
                 let newMonth: string = month < 10 ? '0' + String(month) : String(month);
                 let delivery_At = year + '-' + newMonth + '-' + newDay
                 const time = moment(input.delivery_At).tz('Asia/Phnom_Penh').format("HH:mm");
-                // console.log("input.release_Card_Id", input.release_Card_Id);
-                // console.log("time", time);
+
+                const newItems = await Promise.all(
+                    input.items.map(async (item: any) => {
+                        let getProduct = await Product.findById(item.product_Id);
+                        const obj2 = Object.assign(item, { category: getProduct?.category });
+                        return obj2
+                    })
+                )
                 const updateReleaseCard = await ProductRelease.findByIdAndUpdate(input.release_Card_Id, {
                     ...input,
+                    items: newItems,
                     time,
                     delivery_At,
                     order_Date: new Date(input.order_Date)
                 }).populate('shop_Id release_By delivery_By items.product_Id').exec();
-                // console.log(input);
+
                 if (updateReleaseCard) {
                     return {
                         message: "Update Success!",

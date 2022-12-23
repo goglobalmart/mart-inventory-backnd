@@ -18,6 +18,7 @@ export interface purchaseType {
         product_Id: Types.ObjectId,
         qty: number,
         unit_Price: number,
+        category: string,
         expire_At: Date,
         key: Date,
         product_name: string
