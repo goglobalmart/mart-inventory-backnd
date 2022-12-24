@@ -64,7 +64,7 @@ const reportResolver = {
 
                 const data: any = getPurchas.map((pur) => {
                     let obj = {
-                        _id: pur.product._id,
+                        _id: pur._id,
                         date: pur.receive_Date,
                         product_id: pur.product._id,
                         item: pur.product.name,
