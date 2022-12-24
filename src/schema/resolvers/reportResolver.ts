@@ -160,8 +160,10 @@ const reportResolver = {
                 const data = getStockOut.map((pur) => {
                     let obj = {
                         _id: pur.product._id,
+                        releaseCard_id: pur._id,
                         date: pur.delivery_At,
                         item: pur.product.name,
+                        product_id: pur.product._id,
                         unit: pur.product.unit,
                         amount: pur.items.qty * pur.items.unit_Price,
                         qty: pur.items.qty,
