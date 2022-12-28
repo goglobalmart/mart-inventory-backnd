@@ -169,7 +169,7 @@ const reportResolver = {
                     qtyArraye.push(pur.items.qty)
                     unitPriceArraye.push(pur.items.unit_Price)
                     let obj = {
-                        _id: pur.product._id,
+                        _id: pur.items._id,
                         releaseCard_id: pur._id,
                         date: pur.delivery_At,
                         item: pur.product.name,
