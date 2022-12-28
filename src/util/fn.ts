@@ -20,7 +20,7 @@ export class CheckStock {
     public async stockNotEnough(productNeed: any) {
         const res = await Promise.all(
             productNeed.map(async (element: productStockOutType) => {
-                const getStorage_Room = await StorageRoom.findById(element?.storage_Room_Id).exec();
+                // const getStorage_Room = await StorageRoom.findById(element?.storage_Room_Id).exec();
                 const getProduct = await Product.findById(element?.product_Id).exec();
                 const allItem = await ProductsInStock.find(
                     {

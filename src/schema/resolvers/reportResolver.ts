@@ -62,7 +62,13 @@ const reportResolver = {
                     { $sort: { receive_Date: 1 } },
                 ]);
 
+                let amountArraye: Array<number> = [];
+                let qtyArraye: Array<number> = [];
+                let unitPriceArraye: Array<number> = [];
                 const data: any = getPurchas.map((pur) => {
+                    amountArraye.push(pur.items.qty * pur.items.unit_Price)
+                    qtyArraye.push(pur.items.qty)
+                    unitPriceArraye.push(pur.items.unit_Price)
                     let obj = {
                         _id: pur._id,
                         date: pur.receive_Date,
@@ -76,27 +82,22 @@ const reportResolver = {
                     };
                     return obj;
                 });
-                const Total_Amount = data
-                    .map((e: any) => {
-                        return e.amount;
-                    })
-                    .reduce(
-                        (accumulator: any, currentValue: any) => accumulator + currentValue
-                    );
-                const Total_qty = data
-                    .map((e: any) => {
-                        return e.qty;
-                    })
-                    .reduce(
-                        (accumulator: any, currentValue: any) => accumulator + currentValue
-                    );
-                const Total_unit_Price = data
-                    .map((e: any) => {
-                        return e.unit_Price;
-                    })
-                    .reduce(
-                        (accumulator: any, currentValue: any) => accumulator + currentValue
-                    );
+
+                const initialValue = 0;
+                const Total_Amount = amountArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
+                const Total_qty = qtyArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
+
+                const Total_unit_Price = unitPriceArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
+
 
                 return {
                     data: data,
@@ -157,7 +158,15 @@ const reportResolver = {
                         $unwind: { path: "$shop", preserveNullAndEmptyArrays: true },
                     },
                 ]);
+
+                let amountArraye: Array<number> = [];
+                let qtyArraye: Array<number> = [];
+                let unitPriceArraye: Array<number> = [];
+
                 const data = getStockOut.map((pur) => {
+                    amountArraye.push(pur.items.qty * pur.items.unit_Price)
+                    qtyArraye.push(pur.items.qty)
+                    unitPriceArraye.push(pur.items.unit_Price)
                     let obj = {
                         _id: pur.product._id,
                         releaseCard_id: pur._id,
@@ -172,22 +181,20 @@ const reportResolver = {
                     };
                     return obj;
                 });
-                const Total_Amount = data
-                    .map((e) => {
-                        return e.amount;
-                    })
-                    .reduce((accumulator, currentValue) => accumulator + currentValue);
-                const Total_qty = data
-                    .map((e) => {
-                        return e.qty;
-                    })
-                    .reduce((accumulator, currentValue) => accumulator + currentValue);
-                const Total_unit_Price = data
-                    .map((e) => {
-                        return e.unit_Price;
-                    })
-                    .reduce((accumulator, currentValue) => accumulator + currentValue);
+                const initialValue = 0;
+                const Total_Amount = amountArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
+                const Total_qty = qtyArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
 
+                const Total_unit_Price = unitPriceArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
                 return {
                     data: data,
                     total_unit_price: Total_unit_Price,
