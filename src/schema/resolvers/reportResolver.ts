@@ -207,7 +207,7 @@ const reportResolver = {
         },
         getStockOnhandReport: async (
             _root: undefined,
-            { product_Id }: { product_Id: string }
+            { product_Id, to, from }: { product_Id: string; to: string; from: string }
         ) => {
             try {
                 let queryProduct =
@@ -216,15 +216,32 @@ const reportResolver = {
                         : {
                             _id: new mongoose.Types.ObjectId(product_Id),
                         };
+                let queryFrom =
+                    from.trim().length === 0
+                        ? {}
+                        : { instock_At: { $gte: new Date(from) } };
+                let queryTo =
+                    to.trim().length === 0
+                        ? {}
+                        : { instock_At: { $lte: new Date(to) } };
+
                 const getAllProduct = await Product.find(queryProduct).exec();
+
+
+
                 const getProductsInStockDetail: any = await Promise.all(
                     getAllProduct.map(async (element: any) => {
                         const getproductInStock = await ProductsInStock.find({
-                            product_Id: element._id,
-                            status: false,
-                            stock_Status: "instock",
+                            $and: [
+                                { product_Id: element._id },
+                                { status: false },
+                                { stock_Status: "instock" },
+                                queryTo,
+                                queryFrom
+                            ]
                         }).exec();
 
+                        // console.log(getproductInStock);
                         const getQtyTotal: any = getproductInStock.map(
                             (pro: { qty: any }) => {
                                 return pro.qty;
@@ -257,30 +274,35 @@ const reportResolver = {
                             };
                     })
                 );
+
+                let amountArraye: Array<number> = [];
+                let qtyArraye: Array<number> = [];
+                let unitPriceArraye: Array<number> = [];
+
                 const getFinal = getProductsInStockDetail.filter(
                     (product: any) => product != undefined
                 );
-                const total_all_unit_Price = getFinal
-                    .map((e: any) => {
-                        return e.stock_Detail[0].unit_Price;
-                    })
-                    .reduce(
-                        (accumulator: any, currentValue: any) => accumulator + currentValue
-                    );
-                const Total_All_Amount = getFinal
-                    .map((e: any) => {
-                        return e.total_Amount;
-                    })
-                    .reduce(
-                        (accumulator: any, currentValue: any) => accumulator + currentValue
-                    );
-                const Total_All_Qty = getFinal
-                    .map((e: any) => {
-                        return e.total_Qty;
-                    })
-                    .reduce(
-                        (accumulator: any, currentValue: any) => accumulator + currentValue
-                    );
+                getFinal.forEach((element: any) => {
+                    amountArraye.push(element.total_Amount)
+                    qtyArraye.push(element.total_Qty)
+                    unitPriceArraye.push(element.stock_Detail[0].unit_Price)
+                });
+
+                const initialValue = 0;
+                const Total_All_Amount = amountArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
+                const Total_All_Qty = qtyArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
+
+                const total_all_unit_Price = unitPriceArraye.reduce(
+                    (previousValue, currentValue) => previousValue + currentValue,
+                    initialValue
+                );
+
                 return {
                     message: "Get report Success!",
                     status: true,

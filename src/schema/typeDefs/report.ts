@@ -50,7 +50,7 @@ const report = gql`
         ending: Float 
     }
     type Query {
-        getStockOnhandReport(product_Id: String!): getReportMessage!
+        getStockOnhandReport(product_Id: String!,from: String!, to: String!): getReportMessage!
         getStockInReport(product_Id: String!,from: String!, to: String!): GetStockReport
         getStockOutReport(product_Id: String!,from: String!, to: String!): GetStockReport
         getSummaryStock(from: String!, to: String!): [getSummaryStockReportMessage!]!
