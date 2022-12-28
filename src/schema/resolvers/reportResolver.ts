@@ -65,12 +65,13 @@ const reportResolver = {
                 let amountArraye: Array<number> = [];
                 let qtyArraye: Array<number> = [];
                 let unitPriceArraye: Array<number> = [];
-                const data: any = getPurchas.map((pur) => {
+                const data: any = getPurchas.map((pur: any) => {
                     amountArraye.push(pur.items.qty * pur.items.unit_Price)
                     qtyArraye.push(pur.items.qty)
                     unitPriceArraye.push(pur.items.unit_Price)
                     let obj = {
                         _id: pur.items._id,
+                        purchas_id: pur._id,
                         date: pur.receive_Date,
                         product_id: pur.product._id,
                         item: pur.product.name,

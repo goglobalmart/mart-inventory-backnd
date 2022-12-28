@@ -15,6 +15,7 @@ const report = gql`
    type getStockReport {
         _id: ID
         product_id: ID
+        purchas_id: ID
         releaseCard_id: ID
         date: DataTime
         item: String
