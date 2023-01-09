@@ -23,6 +23,11 @@ const product = gql`
         purchase_Id: Purchase
         expire_At: DataTime
         instock_At: DataTime
+ 
+        stock_Out: Float, 
+        status: Boolean
+        stock_Status: String
+        created_At: DataTime
     }
     type LessProductInStcok {
         name: String
@@ -38,8 +43,13 @@ const product = gql`
         paginator: Paginator!
         message: String
         data: [Product!]
-    }
-    type Paginator {
+    } 
+    type getProductsInStockPaginationMessage {
+        paginator: Paginator!
+        message: String
+        data: [InstoctProduct!]
+    } 
+    type Paginator { 
         slNo: Int
         prev: Int
         next: Int
@@ -78,8 +88,8 @@ const product = gql`
     type Query {
         getAllProduct: [ Product! ]
         getProductsPagination( page: Int!,limit: Int!, keyword: String!, category: String! ): getProductsPaginationMessage!
-        getLessProductInstock: [LessProductInStcok!]!
-        getExpireProducts:[InstoctProduct!]!
+        getLessProductInstock: [LessProductInStcok!]! 
+        getExpireProducts( page: Int!,limit: Int!, keyword: String! ,status: String! ): getProductsInStockPaginationMessage!
     }
     type Mutation {
         createProduct(input: createProductInput!): productMessage!

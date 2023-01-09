@@ -30,6 +30,7 @@ const productResolver = {
                     sort: {
                         created_At: -1,
                     },
+                    
                 }
                 const query = {
                     $and: [
@@ -93,9 +94,49 @@ const productResolver = {
             }
 
         },
-        getExpireProducts: async (_root: undefined, { }) => {
+        getExpireProducts: async (
+            _root: undefined,
+            { page, limit, keyword,status }: { page: number, limit: number, keyword: string ,status: string},
+        ) => {
             try {
+                const options = {
+                    page: page || 1,
+                    limit: limit || 10,
+                    customLabels: productLabels,
+                    sort: {
+                        created_At: -1,
+                    },
+                    populate: "product_Id purchase_Id storage_Room_Id",
+                } 
+                let currentDate = new Date();
+                currentDate.setDate(currentDate.getDate() + 7)
+                const findProduct = await Product.find({ name: { $regex: keyword, $options: "i" } }) 
+                const product_id = findProduct.map(e=>{ return e._id})
+                const productExpired =  {expire_At: { $lte:new Date() }}   
+                const productNearingExpiration =  { expire_At: { $gte: new Date() , $lt: currentDate }} 
+                let statusQuery : any = null
+                if(status === "NearingExpiration"){
+                    statusQuery =  productNearingExpiration
+                } else if(status === "Expired"){
+                    statusQuery = productExpired
+                }else {
+                    statusQuery={}
+                } 
 
+                const query = {
+                    $and: [{
+                        $or:[{
+                              name: { $regex: keyword, $options: "i" } ,
+                              product_Id: { $in: product_id}, 
+                        }] 
+                    },
+                    { status: false },
+                    { stock_Status: "instock" }, 
+                    statusQuery 
+                ]
+                }
+                const products = await ProductsInStock.paginate(query, options); 
+                return products
             } catch (error) {
                 return error
             }

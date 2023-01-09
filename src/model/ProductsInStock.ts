@@ -1,5 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
 import { productInstockType } from "../type/productType";
+import paginate from 'mongoose-paginate-v2';
 
 const productsInStockSchema = new Schema<productInstockType>({
     product_Id: { type: Schema.Types.ObjectId, ref: 'Product' },
@@ -14,6 +15,6 @@ const productsInStockSchema = new Schema<productInstockType>({
     instock_At: Date,
     expire_At: Date
 })
-
+productsInStockSchema.plugin(paginate);
 const ProductsInStock = model<productInstockType, mongoose.PaginateModel<productInstockType>>('ProductsInStock', productsInStockSchema);
 export default ProductsInStock;
