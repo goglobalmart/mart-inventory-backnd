@@ -15,6 +15,15 @@ const product = gql`
         bar_Code: String
         created_At: DataTime
     }
+    type InstoctProduct {
+        product_Id: Product
+        qty: Float
+        unit_Price: Float
+        storage_Room_Id: StorageRoom
+        purchase_Id: Purchase
+        expire_At: DataTime
+        instock_At: DataTime
+    }
     type LessProductInStcok {
         name: String
         qty: Float
@@ -70,6 +79,7 @@ const product = gql`
         getAllProduct: [ Product! ]
         getProductsPagination( page: Int!,limit: Int!, keyword: String!, category: String! ): getProductsPaginationMessage!
         getLessProductInstock: [LessProductInStcok!]!
+        getExpireProducts:[InstoctProduct!]!
     }
     type Mutation {
         createProduct(input: createProductInput!): productMessage!

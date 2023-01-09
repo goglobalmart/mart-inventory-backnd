@@ -164,10 +164,11 @@ const reportResolver = {
                 let qtyArraye: Array<number> = [];
                 let unitPriceArraye: Array<number> = [];
 
-                const data = getStockOut.map((pur) => {
+                const data = getStockOut.map((pur: any) => {
                     amountArraye.push(pur.items.qty * pur.items.unit_Price)
                     qtyArraye.push(pur.items.qty)
                     unitPriceArraye.push(pur.items.unit_Price)
+                    console.log(pur._id);
                     let obj = {
                         _id: pur.items._id,
                         releaseCard_id: pur._id,
