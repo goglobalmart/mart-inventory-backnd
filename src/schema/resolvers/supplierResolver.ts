@@ -51,7 +51,7 @@ const supplier = {
           page: page || 1,
           limit: limit || 10,
           customLabels: Label,
-          sort: { created_at: -1 },
+          sort: { created_at: -1 }, 
         };
         const query = {
           $or: [{ name: { $regex: keyword, $options: "i" } }],
