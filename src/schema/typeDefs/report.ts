@@ -14,6 +14,9 @@ const report = gql`
     }
    type getStockReport {
         _id: ID
+        product_id: ID
+        purchas_id: ID
+        releaseCard_id: ID
         date: DataTime
         item: String
         unit: String
@@ -41,10 +44,17 @@ const report = gql`
         shop: Float
         supplier: Float
     }
+    type getSummaryStockReportMessage {
+        category: String
+        purchasing: Float
+        issues: Float
+        ending: Float 
+    }
     type Query {
-        getStockOnhandReport(product_Id: String!): getReportMessage!
+        getStockOnhandReport(product_Id: String!,from: String!, to: String!): getReportMessage!
         getStockInReport(product_Id: String!,from: String!, to: String!): GetStockReport
         getStockOutReport(product_Id: String!,from: String!, to: String!): GetStockReport
+        getSummaryStock(from: String!, to: String!): [getSummaryStockReportMessage!]!
         getQtyInHand: Float!
         getQtyWillReceived: Float!
         getTotalUser: TotalUserMessage!
@@ -53,6 +63,10 @@ const report = gql`
         getNoPurchase: Float!
         getTotalCost: Float!
         getTotalCancelOrder: Float!
+    }
+    type Mutation {
+        adjustStockin(_id: String!, product_Id: String!, qty: Float!, unit_Price: Float! ): productMessage!
+        adjustStockout(_id: String!, product_Id: String!, qty: Float!, unit_Price: Float! ): productMessage!
     }
 `
 export default report

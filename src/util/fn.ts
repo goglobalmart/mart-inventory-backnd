@@ -1,4 +1,4 @@
-import mongoose, { Number } from 'mongoose';
+import mongoose from 'mongoose';
 import ProductsInStock from '../model/ProductsInStock';
 import Product from '../model/Product';
 import StorageRoom from '../model/StorageRoom'
@@ -13,7 +13,6 @@ export const numberingGenerator = (numbering: number) => {
     var res: string = zero.substring(0, zero.length - str.length) + str;
     return res
 }
-
 export class CheckStock {
     private QtyNeed: number = 0;
     public message?: string;
@@ -21,7 +20,7 @@ export class CheckStock {
     public async stockNotEnough(productNeed: any) {
         const res = await Promise.all(
             productNeed.map(async (element: productStockOutType) => {
-                const getStorage_Room = await StorageRoom.findById(element?.storage_Room_Id).exec();
+                // const getStorage_Room = await StorageRoom.findById(element?.storage_Room_Id).exec();
                 const getProduct = await Product.findById(element?.product_Id).exec();
                 const allItem = await ProductsInStock.find(
                     {
@@ -174,8 +173,6 @@ export class ProductFifoCheck {
     }
     public async calculate() {
 
-        let listCusting: Array<number> = [];
-        
         const allItem = await ProductsInStock.find(
             {
                 stock_Status: "instock",

@@ -88,12 +88,17 @@ const productResolver = {
                     })
                 )
 
-
-
             } catch (error) {
                 return error
             }
 
+        },
+        getExpireProducts: async (_root: undefined, { }) => {
+            try {
+
+            } catch (error) {
+                return error
+            }
         }
     },
     Mutation: {
